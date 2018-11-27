@@ -10,14 +10,4 @@ interface ITorrent {
   enclosure_url: string;
 }
 
-interface ISearchResponse {
-  data: ITorrent[];
-  success: boolean;
-}
-
-interface IDownloadResponse {
-  data: string;
-  success: boolean;
-}
-
-export { IDownloadResponse, ISearchResponse };
+export { ITorrent };

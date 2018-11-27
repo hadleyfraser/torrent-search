@@ -21,7 +21,7 @@ class ThePirateBay {
 
          // This use to work. It changed?
          preg_match_all(
-    "`<tr.*" .
+            "`<tr.*" .
             ".*<td.*<center.*<a.*>(?P<category>.*)</a>.*</td>.*" .
             ".*<td.*<div.*<a href=\"(?P<descriptionLink>.*)\".*>(?P<name>.*)</a>.*" .
             ".*<a href=\"(?P<link>magnet:.*)\".*</a>.*" .
@@ -40,7 +40,7 @@ class ThePirateBay {
         for ($i = 0; $i < $len; ++$i) {
             $tlink = new stdClass();
             $tlink->src = "thepiratebay.org";
-            $tlink->link = $this->url . $result["link"][$i];
+            $tlink->link = $result["link"][$i];
             $tlink->name = strip_tags($result["name"][$i]);
             $tlink->size = ($result["size"][$i] + 0) * unit_size($result["unit"][$i]);
             $tlink->sizeText = $result["size"][$i] . $result["unit"][$i];
