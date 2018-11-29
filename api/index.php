@@ -36,15 +36,19 @@ if ($action === 'search') {
                 include 'stub/kickass.php';
                 json_die($data);
             }
-            $siteSearch = new Kickass;
+            $siteSearch = new Kickass();
             break;
     }
     if (!$siteSearch) {
-        json_die('', false);
+        json_die(false, false);
     }
-    // var_export($siteSearch->search($search));exit;
-    json_die($siteSearch->search($search));
+    try {
+        json_die($siteSearch->search($search));
+    } catch(Exception $e) {
+        json_die(false, false);
+    }
 } else if ($action === 'download' && $url) {
+    $leekx = new Leekx();
     json_die($leekx->get_download_link($url));
 }
 json_die('', false);

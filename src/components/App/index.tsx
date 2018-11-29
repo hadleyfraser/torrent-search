@@ -102,13 +102,15 @@ class AppBase extends React.Component<IProps, IState> {
       isSearching: true
     });
     let sitesComplete = 0;
-    sites.forEach((site, index) => {
+    sites.forEach(site => {
       torrentSearch(search, site).then(response => {
         this.addResults(response);
         sitesComplete++;
         if (sitesComplete === sites.length) {
           this.setState({
-            isSearching: false
+            isSearching: false,
+            isLoading: false,
+            showModal: false
           });
         }
       });
