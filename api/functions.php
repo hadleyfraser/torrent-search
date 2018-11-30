@@ -26,6 +26,6 @@ function unit_size($unit) {
  */
 function json_die($data, $success = true) {
     header('Access-Control-Allow-Origin: *');
-    header('Content-type: application/json');
+    header('Content-Type: application/json');
     die(json_encode(['success' => $success, 'data' => $data]));
 }

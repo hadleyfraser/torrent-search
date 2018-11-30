@@ -32,7 +32,7 @@ if ($action === 'search') {
             break;
         case 'kickass':
             if ($dev) {
-                sleep(4);
+                sleep(2);
                 include 'stub/kickass.php';
                 json_die($data);
             }
@@ -48,6 +48,10 @@ if ($action === 'search') {
         json_die(false, false);
     }
 } else if ($action === 'download' && $url) {
+    if ($dev) {
+        json_die('download-link');
+    }
+
     $leekx = new Leekx();
     json_die($leekx->get_download_link($url));
 }
