@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import TextField from "@material-ui/core/TextField";
-import { CircularProgress } from "@material-ui/core";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const StyledFilterField = styled(props => <TextField {...props} />)`
   width: 250px;

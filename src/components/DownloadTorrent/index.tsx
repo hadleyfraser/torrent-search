@@ -1,15 +1,14 @@
 import * as React from "react";
 import Modal from "src/components/Modal";
 import styled from "styled-components";
-import {
-  Button,
-  CircularProgress,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions
-} from "@material-ui/core";
-import { CheckCircleOutline, ErrorOutline } from "@material-ui/icons";
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogActions from "@material-ui/core/DialogActions";
+import CheckCircleOutline from "@material-ui/icons/CheckCircleOutline";
+import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import { ITorrent } from "src/interfaces";
 import { addTorrent } from "src/utils";
 
@@ -25,6 +24,10 @@ interface IState {
 
 const GreenBox = styled.div`
   color: green;
+`;
+
+const RedBox = styled.div`
+  color: red;
 `;
 
 const DownloadStatus = styled.div`
@@ -54,6 +57,10 @@ class DownloadTorrent extends React.Component<IProps, IState> {
   render() {
     const { close, torrent } = this.props;
     const { isAdding, response, success } = this.state;
+
+    const BoxColor = success ? GreenBox : RedBox;
+    const Icon = success ? CheckCircleOutline : ErrorOutline;
+
     return (
       <Modal open onClose={close}>
         <DialogTitle>
@@ -67,30 +74,19 @@ class DownloadTorrent extends React.Component<IProps, IState> {
             {isAdding ? (
               <CircularProgress />
             ) : response ? (
-              <>
-                {success ? (
-                  <GreenBox>
-                    <CheckCircleOutline fontSize="large" />
-                    <DialogContentText color="inherit">
-                      {response}
-                    </DialogContentText>
-                  </GreenBox>
-                ) : (
-                  <>
-                    <ErrorOutline fontSize="large" color="error" />
-                    <DialogContentText color="error">
-                      {response}
-                    </DialogContentText>
-                  </>
-                )}
-              </>
+              <BoxColor>
+                <Icon fontSize="large" />
+                <DialogContentText color="inherit">
+                  {response}
+                </DialogContentText>
+              </BoxColor>
             ) : null}
           </DownloadStatus>
         </DialogContent>
         {!isAdding && !response ? (
           <DialogActions>
             <Button
-              onClick={this.addTorrent("Movie")}
+              onClick={this.addTorrent("Movies")}
               color="primary"
               autoFocus
             >
