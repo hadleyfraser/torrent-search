@@ -1,6 +1,26 @@
 <?php
+// Regex needs to be fixed
+
+/*
+    <tr><td class="vertTh">
+			<center>
+				<a href="/browse/200" title="More from this category">Video</a><br>
+				(<a href="/browse/205" title="More from this category">TV shows</a>)
+			</center>
+		</td>
+		<td>
+<div class="detName">			<a href="/torrent/26971323/Supergirl.S04E08.HDTV.x264-SVA" class="detLink" title="Details for Supergirl.S04E08.HDTV.x264-SVA">Supergirl.S04E08.HDTV.x264-SVA</a>
+</div>
+<a href="/torrent/26971323/Supergirl.S04E08.HDTV.x264-SVA" title="Download this torrent using magnet"><img src="/static/img/icon-magnet.gif" alt="Magnet link"></a><a href="http://www.bitlord.me/share/?re=ThePirateBay&amp;ba=b8977e&amp;co=fff&amp;sh=gtekJiHbEKtBfc5vJkzxe7gtfbs=&amp;ur=/search/Supergirl%20S04E08/0/99/0&amp;fn=Supergirl.S04E08.HDTV.x264-SVA" target="_blank" title="Play now using Bitlord"><img src="/static/img/icons/icon-bitx.png" alt="Play link"></a><img src="/static/img/11x11p.png"><img src="/static/img/11x11p.png"><font class="detDesc">Uploaded 12-03&nbsp;03:29, Size 282.24&nbsp;MiB, ULed by <a class="detDesc" href="/user/sotnikam/" title="Browse sotnikam">sotnikam</a></font>
+		</td>
+		<td align="right">425</td>
+		<td align="right">31</td>
+	</tr>
+*/
+
+
 class ThePirateBay {
-    private $url = 'https://thepiratebay.org';
+    private $url = 'https://baypirateproxy.org/';
 
     /*
        * Search()
@@ -12,6 +32,7 @@ class ThePirateBay {
 
         $searchUrl = $this->url . "/search/$keyword/$page/99/0";
         $body = file_get_contents($searchUrl);
+        echo $body;exit;
         return $this->get_page_results($body);
 
     }

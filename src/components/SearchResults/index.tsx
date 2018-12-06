@@ -12,17 +12,24 @@ interface IProps {
   className?: string;
   filter?: string;
   results: ITorrent[];
-  showModal: (torrent: ITorrent) => void;
+  downloadTorrent: (torrent: ITorrent) => void;
 }
 
 const SearchResultsBase: React.SFC<IProps> = ({
   className = "",
   filter = "",
   results,
-  showModal
+  downloadTorrent
 }) => (
   <Paper className={className}>
     <Table>
+      <colgroup>
+        <col />
+        <col width="50px" />
+        <col width="50px" />
+        <col width="50px" />
+        <col width="100px" />
+      </colgroup>
       <TableHead>
         <TableRow>
           <TableCell>Name</TableCell>
@@ -38,7 +45,10 @@ const SearchResultsBase: React.SFC<IProps> = ({
             torrent.name.toLowerCase().includes(filter.toLowerCase())
           )
           .map(torrent => (
-            <TableRow key={torrent.link} onClick={() => showModal(torrent)}>
+            <TableRow
+              key={torrent.link}
+              onClick={() => downloadTorrent(torrent)}
+            >
               <TableCell>{torrent.name}</TableCell>
               <TableCell>{torrent.sizeText}</TableCell>
               <TableCell numeric>{torrent.seeds}</TableCell>
@@ -52,6 +62,8 @@ const SearchResultsBase: React.SFC<IProps> = ({
 );
 
 const SearchResults = styled(SearchResultsBase)`
+  overflow-x: auto;
+
   tbody tr {
     transition: all 0.2s;
 

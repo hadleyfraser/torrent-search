@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ITorrent } from "src/interfaces";
+import { IAddTorrentResponse, ITorrent } from "src/interfaces";
 
 const inDev = process.env.NODE_ENV === "development";
 
@@ -8,13 +8,23 @@ const baseUrl = `http://localhost/torrent-search${inDev ? "-src" : ""}/api/?${
   inDev ? "dev=true&" : ""
 }action=`;
 const searchUrl = `${baseUrl}search&search=`;
-const torrentUrl = `${baseUrl}download&url=`;
+const torrentUrl = `${baseUrl}download&url={url}&site={site}&type={type}`;
 
-const getTorrentUrl = async (torrent: ITorrent): Promise<string> => {
-  if (torrent.src === "1337x") {
-    return await getDownloadUrl(torrent.link);
+const addTorrent = async (
+  torrent: ITorrent,
+  type: string
+): Promise<IAddTorrentResponse> => {
+  if (torrent.link) {
+    const response = await axios.get(
+      `${torrentUrl
+        .replace("{url}", encodeURIComponent(torrent.link))
+        .replace("{site}", torrent.src)
+        .replace("{type}", type)}`
+    );
+    return response.data;
+  } else {
+    throw new Error("Torrent Missing");
   }
-  return torrent.link;
 };
 
 const torrentSearch = async (
@@ -29,15 +39,6 @@ const torrentSearch = async (
   }
 };
 
-const getDownloadUrl = async (url: string): Promise<string> => {
-  if (url) {
-    const response = await axios.get(`${torrentUrl}${url}`);
-    return response.data.data;
-  } else {
-    throw new Error("Torrent URL Missing");
-  }
-};
-
 const verifyLocation = async (): Promise<boolean> => {
   if (inDev) {
     return false;
@@ -48,4 +49,4 @@ const verifyLocation = async (): Promise<boolean> => {
     .then(response => response.data.country === "Australia");
 };
 
-export { getTorrentUrl, torrentSearch, verifyLocation };
+export { addTorrent, torrentSearch, verifyLocation };

@@ -1,72 +1,62 @@
 import * as React from "react";
 import styled from "styled-components";
-import Typography from "@material-ui/core/Typography";
-import Modal from "@material-ui/core/Modal";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Typography from "@material-ui/core/Typography";
 import * as _ from "lodash";
-import { getTorrentUrl, torrentSearch, verifyLocation } from "src/utils";
+import { torrentSearch } from "src/utils";
 import { ITorrent } from "src/interfaces";
 import SearchResults from "src/components/SearchResults";
 import SearchField from "src/components/SearchField";
+import Modal from "src/components/Modal";
+import VerifyVPN from "src/components/VerifyVPN";
+import DownloadTorrent from "src/components/DownloadTorrent";
 
-const sites = ["piratebay", "leeks", "kickass"];
+const sites = ["leeks", "kickass"];
 
 interface IProps {
   className?: string;
 }
 
 interface IState {
-  downloadUrl: string;
   filter: string;
-  inAustralia: boolean;
   isLoading: boolean;
   isSearching: boolean;
   results: ITorrent[];
   resultsFound: boolean;
   search: string;
+  selectedTorrent: ITorrent;
   showModal: boolean;
+  verifyingVPN: boolean;
 }
 
-const ModalContent = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #fff;
-  border-radius: 5px;
-  padding: 15px;
-  outline: 0;
-  text-align: center;
-  word-break: break-all;
-`;
-
 class AppBase extends React.Component<IProps, IState> {
-  state = {
-    downloadUrl: "",
+  public state = {
     filter: "",
-    inAustralia: null,
-    isLoading: true,
+    isLoading: false,
     isSearching: false,
     results: [],
     resultsFound: false,
     search: "",
-    showModal: true
+    selectedTorrent: null,
+    showModal: false,
+    verifyingVPN: true
   };
 
-  componentDidMount = async () => {
-    const inAustralia = await verifyLocation();
-    this.setState({ inAustralia, isLoading: false, showModal: false });
-  };
-
-  public showModal = async (torrent: ITorrent) => {
+  public hideVPNVerification = () => {
     this.setState({
-      isLoading: true,
-      showModal: true
+      verifyingVPN: false
     });
-    const downloadUrl = await getTorrentUrl(torrent);
+  };
+
+  public downloadTorrent = async (torrent: ITorrent) => {
     this.setState({
-      downloadUrl,
-      isLoading: false
+      selectedTorrent: torrent
+    });
+  };
+
+  public torrentAdded = () => {
+    this.setState({
+      selectedTorrent: null
     });
   };
 
@@ -97,9 +87,9 @@ class AppBase extends React.Component<IProps, IState> {
 
     this.setState({
       isLoading: true,
+      isSearching: true,
       results: [],
-      showModal: true,
-      isSearching: true
+      showModal: true
     });
     let sitesComplete = 0;
     sites.forEach(site => {
@@ -143,17 +133,14 @@ class AppBase extends React.Component<IProps, IState> {
   public render() {
     const { className } = this.props;
     const {
-      downloadUrl,
       filter,
-      inAustralia,
-      isLoading,
       isSearching,
       results,
       search,
-      showModal
+      selectedTorrent,
+      showModal,
+      verifyingVPN
     } = this.state;
-
-    const inAusOrVerifying = inAustralia || inAustralia === null;
 
     return (
       <div className={className}>
@@ -163,21 +150,8 @@ class AppBase extends React.Component<IProps, IState> {
           </Typography>
         </header>
         <main>
-          {inAusOrVerifying ? (
-            <Modal open={inAusOrVerifying}>
-              <ModalContent>
-                {inAustralia === null ? (
-                  <>
-                    <Typography variant="h5" gutterBottom>
-                      Verifying VPN
-                    </Typography>
-                    <CircularProgress />
-                  </>
-                ) : (
-                  <Typography variant="h5">No VPN Active</Typography>
-                )}
-              </ModalContent>
-            </Modal>
+          {verifyingVPN ? (
+            <VerifyVPN closeModal={this.hideVPNVerification} />
           ) : (
             <>
               <SearchField
@@ -190,22 +164,17 @@ class AppBase extends React.Component<IProps, IState> {
               <SearchResults
                 filter={filter}
                 results={results}
-                showModal={this.showModal}
+                downloadTorrent={this.downloadTorrent}
               />
               <Modal open={!!showModal} onClose={this.hideModal}>
-                <ModalContent>
-                  {!results.length ? (
-                    <CircularProgress />
-                  ) : (
-                    <>
-                      <Typography variant="h5" gutterBottom>
-                        {isLoading && "Loading "}Torrent Link
-                      </Typography>
-                      {isLoading ? <CircularProgress /> : downloadUrl}
-                    </>
-                  )}
-                </ModalContent>
+                {!results.length ? <CircularProgress /> : null}
               </Modal>
+              {selectedTorrent ? (
+                <DownloadTorrent
+                  close={this.torrentAdded}
+                  torrent={selectedTorrent}
+                />
+              ) : null}
             </>
           )}
         </main>

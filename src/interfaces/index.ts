@@ -10,4 +10,9 @@ interface ITorrent {
   enclosure_url: string;
 }
 
-export { ITorrent };
+interface IAddTorrentResponse {
+  data: string;
+  success: boolean;
+}
+
+export { IAddTorrentResponse, ITorrent };

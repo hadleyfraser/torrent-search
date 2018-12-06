@@ -1,4 +1,9 @@
 <?php
+include 'classes/ThePiratebay.php';
+include 'classes/Leekx.php';
+include 'classes/Kickass.php';
+include 'classes/DownloadStation.php';
+
 function pr($arr) {
     echo '<pre>';
     print_r($arr);
@@ -28,4 +33,56 @@ function json_die($data, $success = true) {
     header('Access-Control-Allow-Origin: *');
     header('Content-Type: application/json');
     die(json_encode(['success' => $success, 'data' => $data]));
+}
+
+function search($search, $site, $dev) {
+    switch($site) {
+        case 'piratebay':
+            if ($dev) {
+                include 'stub/piratebay.php';
+                json_die($data);
+            }
+            $siteSearch = new ThePirateBay();
+            break;
+        case 'leeks':
+            if ($dev) {
+                sleep(1);
+                include 'stub/leeks.php';
+                json_die($data);
+            }
+            $siteSearch = new Leekx();
+            break;
+        case 'kickass':
+            if ($dev) {
+                sleep(2);
+                include 'stub/kickass.php';
+                json_die($data);
+            }
+            $siteSearch = new Kickass();
+            break;
+    }
+
+    if (!$siteSearch) {
+        json_die(false, false);
+    }
+
+    try {
+        json_die($siteSearch->search($search));
+    } catch(Exception $e) {
+        json_die(false, false);
+    }
+}
+
+function download($url, $site, $type, $dev) {
+    if ($dev) {
+        json_die('Torrent Added');
+    }
+
+    if ($site === '1337x') {
+        $leekx = new Leekx();
+        $url = urlencode($leekx->get_download_link($url));
+    }
+
+    $ds = new DownloadStation();
+    $ds->addTorrent($url, $type);
 }
