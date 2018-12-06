@@ -7,9 +7,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions,
-  Typography
+  DialogActions
 } from "@material-ui/core";
+import { CheckCircleOutline, ErrorOutline } from "@material-ui/icons";
 import { ITorrent } from "src/interfaces";
 import { addTorrent } from "src/utils";
 
@@ -22,6 +22,10 @@ interface IState {
   response: string;
   success: boolean;
 }
+
+const GreenBox = styled.div`
+  color: green;
+`;
 
 const DownloadStatus = styled.div`
   margin-top: 20px;
@@ -62,13 +66,25 @@ class DownloadTorrent extends React.Component<IProps, IState> {
           <DownloadStatus>
             {isAdding ? (
               <CircularProgress />
-            ) : (
+            ) : response ? (
               <>
-                <DialogContentText color={success ? "default" : "error"}>
-                  {response}
-                </DialogContentText>
+                {success ? (
+                  <GreenBox>
+                    <CheckCircleOutline fontSize="large" />
+                    <DialogContentText color="inherit">
+                      {response}
+                    </DialogContentText>
+                  </GreenBox>
+                ) : (
+                  <>
+                    <ErrorOutline fontSize="large" color="error" />
+                    <DialogContentText color="error">
+                      {response}
+                    </DialogContentText>
+                  </>
+                )}
               </>
-            )}
+            ) : null}
           </DownloadStatus>
         </DialogContent>
         {!isAdding && !response ? (
@@ -87,14 +103,6 @@ class DownloadTorrent extends React.Component<IProps, IState> {
         ) : null}
       </Modal>
     );
-    // return (
-    //   <>
-    //     <Typography variant="h5" gutterBottom>
-    //       {isLoading && "Loading "}Torrent Link
-    //     </Typography>
-    //     {isLoading ? <CircularProgress /> : downloadUrl}
-    //   </>
-    // );
   }
 }
 

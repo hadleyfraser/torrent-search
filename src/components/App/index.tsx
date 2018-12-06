@@ -60,6 +60,58 @@ class AppBase extends React.Component<IProps, IState> {
     });
   };
 
+  public render() {
+    const { className } = this.props;
+    const {
+      filter,
+      isSearching,
+      results,
+      search,
+      selectedTorrent,
+      showModal,
+      verifyingVPN
+    } = this.state;
+
+    return (
+      <div className={className}>
+        <header>
+          <Typography variant="h3" gutterBottom>
+            Torrent Search
+          </Typography>
+        </header>
+        <main>
+          {verifyingVPN ? (
+            <VerifyVPN closeModal={this.hideVPNVerification} />
+          ) : (
+            <>
+              <SearchField
+                loading={isSearching}
+                onKeyUp={e => e.keyCode === 13 && this.handleSubmit()}
+                onChange={this.handleSearchChange}
+                onFilter={this.handleFilter}
+                value={search}
+              />
+              <SearchResults
+                filter={filter}
+                results={results}
+                downloadTorrent={this.downloadTorrent}
+              />
+              <Modal open={!!showModal} onClose={this.hideModal}>
+                {!results.length ? <CircularProgress /> : null}
+              </Modal>
+              {selectedTorrent ? (
+                <DownloadTorrent
+                  close={this.torrentAdded}
+                  torrent={selectedTorrent}
+                />
+              ) : null}
+            </>
+          )}
+        </main>
+      </div>
+    );
+  }
+
   private hideModal = () => {
     if (this.state.isLoading) {
       return;
@@ -129,58 +181,6 @@ class AppBase extends React.Component<IProps, IState> {
   private handleFilter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     this.setState({ filter: (e.target as HTMLInputElement).value });
   };
-
-  public render() {
-    const { className } = this.props;
-    const {
-      filter,
-      isSearching,
-      results,
-      search,
-      selectedTorrent,
-      showModal,
-      verifyingVPN
-    } = this.state;
-
-    return (
-      <div className={className}>
-        <header>
-          <Typography variant="h3" gutterBottom>
-            Torrent Search
-          </Typography>
-        </header>
-        <main>
-          {verifyingVPN ? (
-            <VerifyVPN closeModal={this.hideVPNVerification} />
-          ) : (
-            <>
-              <SearchField
-                loading={isSearching}
-                onKeyUp={e => e.keyCode === 13 && this.handleSubmit()}
-                onChange={this.handleSearchChange}
-                onFilter={this.handleFilter}
-                value={search}
-              />
-              <SearchResults
-                filter={filter}
-                results={results}
-                downloadTorrent={this.downloadTorrent}
-              />
-              <Modal open={!!showModal} onClose={this.hideModal}>
-                {!results.length ? <CircularProgress /> : null}
-              </Modal>
-              {selectedTorrent ? (
-                <DownloadTorrent
-                  close={this.torrentAdded}
-                  torrent={selectedTorrent}
-                />
-              ) : null}
-            </>
-          )}
-        </main>
-      </div>
-    );
-  }
 }
 
 const App = styled(AppBase)`
