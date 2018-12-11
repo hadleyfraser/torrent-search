@@ -4,10 +4,12 @@ include 'classes/Leekx.php';
 include 'classes/Kickass.php';
 include 'classes/DownloadStation.php';
 
-function pr($arr) {
+function pr($arr, $exit = true) {
     echo '<pre>';
     print_r($arr);
-    exit;
+    if ($exit) {
+        exit;
+    }
 }
 
 /*
@@ -80,7 +82,7 @@ function download($url, $site, $type, $dev) {
 
     if ($site === '1337x') {
         $leekx = new Leekx();
-        $url = urlencode($leekx->get_download_link($url));
+        $url = $leekx->get_download_link($url);
     }
 
     $ds = new DownloadStation();

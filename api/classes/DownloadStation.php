@@ -57,8 +57,11 @@ class DownloadStation {
   }
 
   private function dsAddTorrent($torrentUrl, $type) {
-    $url = sprintf($this->addTorrentEndpoint, $type, $torrentUrl, $this->sid);
+    $url = sprintf($this->addTorrentEndpoint, $type, urlencode($torrentUrl), $this->sid);
     $added = $this->make_call($url, 'POST');
+    if (!$added) {
+      json_die('The response could not be decoded', false);
+    }
     $error = $added->error;
     if ($error) {
       json_die(sprintf('Error Adding Torrent: %d', $error));
