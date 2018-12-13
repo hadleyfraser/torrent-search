@@ -41,8 +41,10 @@ const SearchResultsBase: React.SFC<IProps> = ({
       </TableHead>
       <TableBody>
         {results
-          .filter(torrent =>
-            torrent.name.toLowerCase().includes(filter.toLowerCase())
+          .filter(
+            torrent =>
+              torrent.peers &&
+              torrent.name.toLowerCase().includes(filter.toLowerCase())
           )
           .map(torrent => (
             <TableRow
