@@ -16,6 +16,6 @@ if ($action === 'search') {
 } else if ($action === 'download' && $url) {
     download($url, $site, $type, $dev);
 } else if($action === 'download-list') {
-    downloadList();
+    downloadList($dev);
 }
 json_die('', false);

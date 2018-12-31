@@ -16,6 +16,7 @@ interface ITorrent {
 
 type IAddTorrentResponse = IResponse & {
   data: string;
+  success: boolean;
 };
 
 interface IDownload {
@@ -31,7 +32,9 @@ interface IDownload {
 }
 
 type ITorrentListResponse = IResponse & {
-  data: IDownload[];
+  data: {
+    data: IDownload[];
+  };
 };
 
 export { IAddTorrentResponse, IDownload, ITorrent, ITorrentListResponse };

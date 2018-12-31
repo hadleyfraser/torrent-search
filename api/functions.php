@@ -89,11 +89,14 @@ function download($url, $site, $type, $dev) {
     $ds->addTorrent($url, $type);
 }
 
-function downloadList() {
+function downloadList($dev) {
     if($dev) {
         sleep(2);
         $downloadList = json_decode(file_get_contents(__DIR__ . '/stub/download-list.json'));
+        json_die($downloadList);
     }
 
+    $ds = new DownloadStation();
+    $downloadList = $ds->getTorrentList();
     json_die($downloadList);
 }

@@ -43,10 +43,8 @@ const clearComplete = async (): Promise<boolean> => {
   }
 };
 
-const getTorrentList = async (): Promise<IDownload[]> => {
-  // const response = await axios.get(torrentListUrl);
-  // return response.data;
-  const response: ITorrentListResponse = require("./torrent-list.json");
+const getTorrentList = async (): Promise<ITorrentListResponse> => {
+  const response = await axios.get(torrentListUrl);
   return response.data;
 };
 

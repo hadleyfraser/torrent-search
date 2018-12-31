@@ -11,7 +11,7 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { bytesToSize } from "src/utils";
 import { clearComplete, getTorrentList } from "src/utils/services";
-import { IDownload } from "src/interfaces";
+import { IDownload, IAddTorrentResponse } from "src/interfaces";
 import Modal from "src/components/Modal";
 import Action from "src/components/Action";
 
@@ -23,7 +23,6 @@ interface IProps {
 interface IState {
   isClearing: boolean;
   torrentList: IDownload[];
-  updateTimer: NodeJS.Timeout;
 }
 
 const Header = styled.div`
@@ -34,20 +33,19 @@ const torrentListTimeout = 1000;
 const loaderSize = 25;
 
 class TorrentListBase extends React.Component<IProps, IState> {
+  private mounted = false;
   public state = {
     isClearing: false,
-    torrentList: [],
-    updateTimer: null
+    torrentList: []
   };
 
   componentDidMount() {
+    this.mounted = true;
     this.updateTorrentList();
-    const updateTimer = setInterval(this.updateTorrentList, torrentListTimeout);
-    this.setState({ updateTimer });
   }
 
   componentWillUnmount() {
-    clearInterval(this.state.updateTimer);
+    this.mounted = false;
   }
 
   public clearComplete = async () => {
@@ -55,11 +53,13 @@ class TorrentListBase extends React.Component<IProps, IState> {
       isClearing: true
     });
     await clearComplete();
-    setTimeout(() => {
-      this.setState({
-        isClearing: false
-      });
-    }, 2000);
+    if (!this.mounted) {
+      return;
+    }
+
+    this.setState({
+      isClearing: false
+    });
   };
 
   render() {
@@ -93,27 +93,35 @@ class TorrentListBase extends React.Component<IProps, IState> {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {torrentList.map(torrent => (
-                  <TableRow
-                    key={torrent.source}
-                    className={torrent.progress === 100 ? "complete" : ""}
-                  >
-                    <TableCell className="name">
-                      <span>{torrent.source}</span>
-                    </TableCell>
-                    <TableCell className="size">
-                      {bytesToSize(torrent.size)}
-                    </TableCell>
-                    <TableCell className="progress">
-                      <div>
-                        <span style={{ width: `${torrent.progress}%` }} />
-                        <span>{torrent.progress}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell numeric>{torrent.seeds}</TableCell>
-                    <TableCell numeric>{torrent.peers}</TableCell>
-                  </TableRow>
-                ))}
+                {torrentList.map((torrent: IDownload) => {
+                  const progress =
+                    torrent.state === 100 ? 100 : torrent.progress;
+                  return (
+                    <TableRow
+                      key={torrent.source}
+                      className={progress === 100 ? "complete" : ""}
+                    >
+                      <TableCell className="name">
+                        <span>{torrent.source}</span>
+                      </TableCell>
+                      <TableCell className="size">
+                        {bytesToSize(torrent.size)}
+                      </TableCell>
+                      <TableCell className="progress">
+                        <div>
+                          <span
+                            style={{
+                              width: `${progress}%`
+                            }}
+                          />
+                          <span>{progress}%</span>
+                        </div>
+                      </TableCell>
+                      <TableCell numeric>{torrent.seeds}</TableCell>
+                      <TableCell numeric>{torrent.peers}</TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </Paper>
@@ -124,7 +132,12 @@ class TorrentListBase extends React.Component<IProps, IState> {
 
   private updateTorrentList = async () => {
     const torrentList = await getTorrentList();
-    this.setState({ torrentList });
+    torrentList;
+    if (!this.mounted) {
+      return;
+    }
+    this.setState({ torrentList: torrentList.data.data });
+    setTimeout(this.updateTorrentList, torrentListTimeout);
   };
 }
 

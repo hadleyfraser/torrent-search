@@ -23,12 +23,6 @@ const Action = styled(ActionBase)`
   color: ${({ color }) => color || ""};
   transition: 0.2s all;
   ${({ onClick }) => (onClick ? "cursor: pointer" : "")}
-
-  /* ${({ color }) => `
-  &:hover {
-    darken(${color}, 10);
-  }`} */
-
   ${({ hoverColor }) =>
     hoverColor
       ? `
@@ -37,7 +31,5 @@ const Action = styled(ActionBase)`
         }`
       : ""}
 `;
-// color: #05bb05
-// hover: #069c06
 
 export default Action;
