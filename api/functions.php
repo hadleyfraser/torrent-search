@@ -90,7 +90,7 @@ function download($url, $site, $type, $dev) {
 }
 
 function downloadList($dev) {
-    if($dev) {
+    if ($dev) {
         sleep(2);
         $downloadList = json_decode(file_get_contents(__DIR__ . '/stub/download-list.json'));
         json_die($downloadList);
@@ -98,5 +98,16 @@ function downloadList($dev) {
 
     $ds = new DownloadStation();
     $downloadList = $ds->getTorrentList();
+    json_die($downloadList);
+}
+
+function clearCompleteTorrents($dev) {
+    if ($dev) {
+        sleep(1);
+        json_die(["data" => []]);
+    }
+
+    $ds = new DownloadStation();
+    $downloadList = $ds->clearCompleteTorrents();
     json_die($downloadList);
 }

@@ -11,11 +11,21 @@ $dev = $_REQUEST['dev'] == 'true';
 if ($dev) {
     sleep(1);
 }
-if ($action === 'search') {
-    search($search, $site, $dev);
-} else if ($action === 'download' && $url) {
-    download($url, $site, $type, $dev);
-} else if($action === 'download-list') {
-    downloadList($dev);
+switch($action) {
+    case 'search':
+        search($search, $site, $dev);
+        break;
+    case 'download':
+        if ($url) {
+            download($url, $site, $type, $dev);
+        }
+        break;
+    case 'download-list':
+        downloadList($dev);
+        break;
+    case 'clear-completed':
+        clearCompleteTorrents($dev);
+       break;
 }
+
 json_die('', false);

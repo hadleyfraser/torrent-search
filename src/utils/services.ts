@@ -15,7 +15,7 @@ const baseUrl = `http://localhost/torrent-search${inDev ? "-src" : ""}/api/?${
 const searchUrl = `${baseUrl}search&search=`;
 const torrentUrl = `${baseUrl}download&url={url}&site={site}&type={type}`;
 const torrentListUrl = `${baseUrl}download-list`;
-const clearTorrentListUrl = `${baseUrl}clear-download-list`;
+const clearTorrentListUrl = `${baseUrl}clear-completed`;
 
 const addTorrent = async (
   torrent: ITorrent,
@@ -34,12 +34,12 @@ const addTorrent = async (
   }
 };
 
-const clearComplete = async (): Promise<boolean> => {
+const clearComplete = async (): Promise<ITorrentListResponse> => {
   try {
-    await axios.get(clearTorrentListUrl);
-    return true;
+    const response = await axios.get(clearTorrentListUrl);
+    return response.data;
   } catch (e) {
-    return false;
+    throw new Error("Could not clear completed torrents");
   }
 };
 

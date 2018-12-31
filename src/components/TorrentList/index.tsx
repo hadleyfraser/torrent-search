@@ -22,6 +22,7 @@ interface IProps {
 
 interface IState {
   isClearing: boolean;
+  isLoading: boolean;
   torrentList: IDownload[];
 }
 
@@ -36,6 +37,7 @@ class TorrentListBase extends React.Component<IProps, IState> {
   private mounted = false;
   public state = {
     isClearing: false,
+    isLoading: true,
     torrentList: []
   };
 
@@ -52,19 +54,25 @@ class TorrentListBase extends React.Component<IProps, IState> {
     this.setState({
       isClearing: true
     });
-    await clearComplete();
+
+    const torrentList = await clearComplete();
     if (!this.mounted) {
       return;
     }
 
+    this.updateTorrentList();
+
     this.setState({
-      isClearing: false
+      isClearing: false,
+      torrentList: torrentList.data.data
     });
   };
 
   render() {
     const { className, closeModal } = this.props;
-    const { isClearing, torrentList } = this.state;
+    const { isClearing, isLoading, torrentList } = this.state;
+
+    const showSpinner = isClearing || isLoading;
 
     return (
       <Modal open onClose={closeModal}>
@@ -76,9 +84,9 @@ class TorrentListBase extends React.Component<IProps, IState> {
             <Action
               color="red"
               hardRight
-              onClick={!isClearing ? this.clearComplete : null}
+              onClick={!showSpinner ? this.clearComplete : null}
             >
-              {isClearing ? <CircularProgress size={loaderSize} /> : <Block />}
+              {showSpinner ? <CircularProgress size={loaderSize} /> : <Block />}
             </Action>
           </Header>
           <Paper>
@@ -133,10 +141,10 @@ class TorrentListBase extends React.Component<IProps, IState> {
   private updateTorrentList = async () => {
     const torrentList = await getTorrentList();
     torrentList;
-    if (!this.mounted) {
+    if (!this.mounted || this.state.isClearing) {
       return;
     }
-    this.setState({ torrentList: torrentList.data.data });
+    this.setState({ torrentList: torrentList.data.data, isLoading: false });
     setTimeout(this.updateTorrentList, torrentListTimeout);
   };
 }

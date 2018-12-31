@@ -211,6 +211,7 @@ class AppBase extends React.Component<IProps, IState> {
 
 const App = styled(AppBase)`
   header {
+    z-index: 2000;
     position: relative;
     padding-top: 10px;
     background: #eee;
