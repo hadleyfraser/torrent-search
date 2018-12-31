@@ -1,3 +1,7 @@
+interface IResponse {
+  success: boolean;
+}
+
 interface ITorrent {
   src: string;
   link: string;
@@ -10,9 +14,27 @@ interface ITorrent {
   enclosure_url: string;
 }
 
-interface IAddTorrentResponse {
+type IAddTorrentResponse = IResponse & {
   data: string;
   success: boolean;
+};
+
+interface IDownload {
+  down_rate: number;
+  error: number;
+  eta: number;
+  peers: number;
+  progress: number;
+  seeds: number;
+  size: number;
+  source: string;
+  state: number;
 }
 
-export { IAddTorrentResponse, ITorrent };
+type ITorrentListResponse = IResponse & {
+  data: {
+    data: IDownload[];
+  };
+};
+
+export { IAddTorrentResponse, IDownload, ITorrent, ITorrentListResponse };

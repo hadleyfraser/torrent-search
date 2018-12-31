@@ -10,7 +10,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import CheckCircleOutline from "@material-ui/icons/CheckCircleOutline";
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import { ITorrent } from "src/interfaces";
-import { addTorrent } from "src/utils";
+import { addTorrent } from "src/utils/services";
 
 interface IProps {
   close: () => void;

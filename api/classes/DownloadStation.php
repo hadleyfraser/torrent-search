@@ -17,6 +17,7 @@ class DownloadStation {
     $this->loginEndpoint = sprintf('%s/%s', $env->baseUrl, $env->login);
     $this->logoutEndpoint = sprintf('%s/%s', $env->baseUrl, $env->logout);
     $this->addTorrentEndpoint = sprintf('%s/%s', $env->baseUrl, $env->add);
+    $this->getListEndpoint = sprintf('%s/%s', $env->baseUrl, $env->getList);
   }
 
   private function make_call($url, $requestType = 'GET') {
@@ -56,6 +57,13 @@ class DownloadStation {
     json_die('Torrent Added');
   }
 
+  public function getTorrentList() {
+    $this->dsLogin();
+    $response = $this->dsGetTorrentList();
+    $this->dsLogout();
+    json_die($response);
+  }
+
   private function dsAddTorrent($torrentUrl, $type) {
     $url = sprintf($this->addTorrentEndpoint, $type, urlencode($torrentUrl), $this->sid);
     $added = $this->make_call($url, 'POST');
@@ -64,7 +72,7 @@ class DownloadStation {
     }
     $error = $added->error;
     if ($error) {
-      json_die(sprintf('Error Adding Torrent: %d', $error));
+      json_die(sprintf('Error Adding Torrent: %d', $error), false);
     }
   }
 
@@ -81,8 +89,22 @@ class DownloadStation {
       if ($error === 4) {
         json_die('Failed to login', false);
       }
-      json_die(sprintf('Unknown Error: %d', $error));
+      json_die(sprintf('Unknown Error: %d', $error), false);
     }
     $this->sid = $login->sid;
+  }
+
+  private function dsGetTorrentList() {
+    $url = sprintf($this->getListEndpoint, $this->sid);
+    $list = $this->make_call($url);
+    if (!$list) {
+      json_die('The response could not be decoded', false);
+    }
+    $error = $list->error;
+    if ($error) {
+      json_die(sprintf('Error Retrieving Torrent List: %d', $error), false);
+    }
+
+    return $list;
   }
 }

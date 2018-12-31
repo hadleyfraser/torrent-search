@@ -1,15 +1,18 @@
 import * as React from "react";
 import styled from "styled-components";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import CloudDownload from "@material-ui/icons/CloudDownload";
 import Typography from "@material-ui/core/Typography";
 import * as _ from "lodash";
-import { torrentSearch } from "src/utils";
+import { torrentSearch } from "src/utils/services";
 import { ITorrent } from "src/interfaces";
 import SearchResults from "src/components/SearchResults";
 import SearchField from "src/components/SearchField";
 import Modal from "src/components/Modal";
 import VerifyVPN from "src/components/VerifyVPN";
 import DownloadTorrent from "src/components/DownloadTorrent";
+import TorrentList from "src/components/TorrentList";
+import Action from "src/components/Action";
 
 const sites = ["leeks", "kickass"];
 
@@ -25,6 +28,7 @@ interface IState {
   resultsFound: boolean;
   search: string;
   selectedTorrent: ITorrent;
+  showDownloads: boolean;
   showModal: boolean;
   verifyingVPN: boolean;
 }
@@ -38,6 +42,7 @@ class AppBase extends React.Component<IProps, IState> {
     resultsFound: false,
     search: "",
     selectedTorrent: null,
+    showDownloads: false,
     showModal: false,
     verifyingVPN: true
   };
@@ -60,6 +65,12 @@ class AppBase extends React.Component<IProps, IState> {
     });
   };
 
+  public hideDownloads = () => {
+    this.setState({
+      showDownloads: false
+    });
+  };
+
   public render() {
     const { className } = this.props;
     const {
@@ -68,6 +79,7 @@ class AppBase extends React.Component<IProps, IState> {
       results,
       search,
       selectedTorrent,
+      showDownloads,
       showModal,
       verifyingVPN
     } = this.state;
@@ -78,6 +90,13 @@ class AppBase extends React.Component<IProps, IState> {
           <Typography variant="h3" gutterBottom>
             Torrent Search
           </Typography>
+          <Action
+            onClick={this.showDownloads}
+            color="#05bb05"
+            hoverColor="#069c06"
+          >
+            <CloudDownload />
+          </Action>
         </header>
         <main>
           {verifyingVPN ? (
@@ -107,10 +126,30 @@ class AppBase extends React.Component<IProps, IState> {
               ) : null}
             </>
           )}
+          {showDownloads && <TorrentList closeModal={this.hideDownloads} />}
         </main>
       </div>
     );
   }
+
+  private addResults = (torrentList: ITorrent[]) => {
+    if (!torrentList) {
+      return;
+    }
+    this.setState(({ results }) => {
+      let allResults = _.chain(results)
+        .concat(torrentList)
+        .orderBy("seeds", "desc")
+        .value();
+
+      return {
+        isLoading: false,
+        resultsFound: true,
+        showModal: false,
+        results: allResults
+      };
+    });
+  };
 
   private hideModal = () => {
     if (this.state.isLoading) {
@@ -159,22 +198,9 @@ class AppBase extends React.Component<IProps, IState> {
     });
   };
 
-  private addResults = (torrentList: ITorrent[]) => {
-    if (!torrentList) {
-      return;
-    }
-    this.setState(({ results }) => {
-      let allResults = _.chain(results)
-        .concat(torrentList)
-        .orderBy("seeds", "desc")
-        .value();
-
-      return {
-        isLoading: false,
-        resultsFound: true,
-        showModal: false,
-        results: allResults
-      };
+  private showDownloads = () => {
+    this.setState({
+      showDownloads: true
     });
   };
 
@@ -185,10 +211,11 @@ class AppBase extends React.Component<IProps, IState> {
 
 const App = styled(AppBase)`
   header {
-    text-align: center;
-    border-bottom: solid 2px #ccc;
+    position: relative;
     padding-top: 10px;
     background: #eee;
+    text-align: center;
+    border-bottom: solid 2px #ccc;
   }
 
   main {

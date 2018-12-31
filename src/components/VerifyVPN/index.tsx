@@ -2,7 +2,7 @@ import * as React from "react";
 import Typography from "@material-ui/core/Typography";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Modal from "src/components/Modal";
-import { verifyLocation } from "src/utils";
+import { verifyLocation } from "src/utils/services";
 
 interface IProps {
   closeModal: () => void;
