@@ -19,6 +19,8 @@ class DownloadStation {
     $this->addTorrentEndpoint = sprintf('%s/%s', $env->baseUrl, $env->add);
     $this->getListEndpoint = sprintf('%s/%s', $env->baseUrl, $env->getList);
     $this->removeTorrentEndpoint = sprintf('%s/%s', $env->baseUrl, $env->removeTorrent);
+    $this->pauseTorrentEndpoint = sprintf('%s/%s', $env->baseUrl, $env->pauseTorrent);
+    $this->startTorrentEndpoint = sprintf('%s/%s', $env->baseUrl, $env->startTorrent);
   }
 
   private function make_call($url, $requestType = 'GET') {
@@ -78,6 +80,18 @@ class DownloadStation {
     json_die($torrentList);
   }
 
+  public function changeTorrentStatus($hash, $isPaused) {
+    $this->dsLogin();
+    if (!$isPaused) {
+      $this->dsPauseTorrent($hash);
+    } else {
+      $this->dsStartTorrent($hash);
+    }
+    $torrentList = $this->dsGetTorrentList();
+    $this->dsLogout();
+    json_die($torrentList);
+  }
+
   private function dsAddTorrent($torrentUrl, $type) {
     $url = sprintf($this->addTorrentEndpoint, $type, urlencode($torrentUrl), $this->sid);
     $added = $this->make_call($url, 'POST');
@@ -120,6 +134,22 @@ class DownloadStation {
     }
 
     return $list;
+  }
+
+  private function dsPauseTorrent($hash) {
+    $url = sprintf($this->pauseTorrentEndpoint, $this->sid, $hash);
+    $paused = $this->make_call($url);
+    if ($paused->error) {
+      json_die(sprintf('Error Pausing Torrent: %d', $error), false);
+    }
+  }
+
+  private function dsStartTorrent($hash) {
+    $url = sprintf($this->startTorrentEndpoint, $this->sid, $hash);
+    $paused = $this->make_call($url);
+    if ($paused->error) {
+      json_die(sprintf('Error Starting Torrent: %d', $error), false);
+    }
   }
 
   private function dsRemoveTorrent($hash) {

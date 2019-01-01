@@ -21,6 +21,7 @@
     "start": "NODE_ENV=dev react-scripts-ts start",
     "build": "yarn build:only && yarn delete-build && yarn move-build",
     "build:only": "react-scripts-ts build",
+    "copy:api": "rmdir ..\\torrent-search\\api /s /q && xcopy api ..\\torrent-search\\api /i /e",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
     "delete-build": "rmdir ..\\torrent-search /s /q",

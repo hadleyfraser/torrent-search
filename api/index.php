@@ -6,6 +6,8 @@ $search = $_REQUEST['search'];
 $site = $_REQUEST['site'];
 $url = $_REQUEST['url'];
 $type = $_REQUEST['type'];
+$hash = $_REQUEST['hash'];
+$isPaused = $_REQUEST['isPaused'] === "true";
 $dev = $_REQUEST['dev'] == 'true';
 
 if ($dev) {
@@ -26,6 +28,9 @@ switch($action) {
     case 'clear-completed':
         clearCompleteTorrents($dev);
        break;
+    case 'change-status':
+        changeTorrentStatus($hash, $isPaused, $dev);
+    break;
 }
 
 json_die('', false);

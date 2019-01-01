@@ -9,9 +9,13 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-import { bytesToSize } from "src/utils";
-import { clearComplete, getTorrentList } from "src/utils/services";
-import { IDownload, IAddTorrentResponse } from "src/interfaces";
+import { bytesToSize, secondsToTime, getTorrentStatus } from "src/utils";
+import {
+  changeTorrentStatus,
+  clearComplete,
+  getTorrentList
+} from "src/utils/services";
+import { IDownload } from "src/interfaces";
 import Modal from "src/components/Modal";
 import Action from "src/components/Action";
 
@@ -97,6 +101,7 @@ class TorrentListBase extends React.Component<IProps, IState> {
                   <TableCell>Size</TableCell>
                   <TableCell>Download Rate</TableCell>
                   <TableCell>Percentage</TableCell>
+                  <TableCell>ETA</TableCell>
                   <TableCell numeric>Seeders</TableCell>
                   <TableCell numeric>Leechers</TableCell>
                 </TableRow>
@@ -105,10 +110,15 @@ class TorrentListBase extends React.Component<IProps, IState> {
                 {torrentList.map((torrent: IDownload) => {
                   const progress =
                     torrent.state === 100 ? 100 : torrent.progress;
+                  const complete = progress === 100;
+
                   return (
                     <TableRow
                       key={torrent.source}
-                      className={progress === 100 ? "complete" : ""}
+                      className={complete ? "complete" : "incomplete"}
+                      onClick={
+                        !complete ? this.handleTorrentClick(torrent) : null
+                      }
                     >
                       <TableCell className="name">
                         <span>{torrent.source}</span>
@@ -126,8 +136,13 @@ class TorrentListBase extends React.Component<IProps, IState> {
                               width: `${progress}%`
                             }}
                           />
-                          <span>{progress}%</span>
+                          <span>
+                            {getTorrentStatus(torrent) || `${progress}%`}
+                          </span>
                         </div>
+                      </TableCell>
+                      <TableCell numeric>
+                        {torrent.eta > 0 ? secondsToTime(torrent.eta) : 0}
                       </TableCell>
                       <TableCell numeric>{torrent.seeds}</TableCell>
                       <TableCell numeric>{torrent.peers}</TableCell>
@@ -149,15 +164,36 @@ class TorrentListBase extends React.Component<IProps, IState> {
       return;
     }
     this.setState({ torrentList: torrentList.data.data, isLoading: false });
-    setTimeout(this.updateTorrentList, torrentListTimeout);
+    // setTimeout(this.updateTorrentList, torrentListTimeout);
+  };
+
+  private handleTorrentClick = (torrent: IDownload) => async () => {
+    this.setState({ isLoading: true });
+    const torrentList = await changeTorrentStatus(torrent);
+    this.setState({ isLoading: false, torrentList: torrentList.data.data });
   };
 }
 
 const TorrentList = styled(TorrentListBase)`
   word-break: normal;
 
-  .complete .name {
-    color: green;
+  tr {
+    transition: 0.2s all;
+  }
+
+  .incomplete:hover {
+    background: #eee;
+    cursor: pointer;
+  }
+
+  .complete {
+    .name {
+      color: green;
+    }
+
+    .progress span:first-child {
+      background: #069c06;
+    }
   }
 
   .name span {

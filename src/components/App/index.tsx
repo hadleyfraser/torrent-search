@@ -42,7 +42,7 @@ class AppBase extends React.Component<IProps, IState> {
     resultsFound: false,
     search: "",
     selectedTorrent: null,
-    showDownloads: false,
+    showDownloads: true,
     showModal: false,
     verifyingVPN: true
   };

@@ -23,6 +23,7 @@ interface IDownload {
   down_rate: number;
   error: number;
   eta: number;
+  hash: string;
   peers: number;
   progress: number;
   seeds: number;

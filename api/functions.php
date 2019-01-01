@@ -104,10 +104,24 @@ function downloadList($dev) {
 function clearCompleteTorrents($dev) {
     if ($dev) {
         sleep(1);
-        json_die(["data" => []]);
+        $downloadList = json_decode(file_get_contents(__DIR__ . '/stub/download-list.json'));
+        $downloadList->data = [$downloadList->data[0]];
+        json_die($downloadList);
     }
 
     $ds = new DownloadStation();
     $downloadList = $ds->clearCompleteTorrents();
+    json_die($downloadList);
+}
+
+function changeTorrentStatus($hash, $isPaused, $dev) {
+    if ($dev) {
+        $downloadList = json_decode(file_get_contents(__DIR__ . '/stub/download-list.json'));
+        $downloadList->data[0]->state = $isPaused ? 104 : 1;
+        json_die($downloadList);
+    }
+
+    $ds = new DownloadStation();
+    $downloadList = $ds->changeTorrentStatus($hash, $isPaused);
     json_die($downloadList);
 }
