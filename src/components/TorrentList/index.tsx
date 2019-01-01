@@ -95,6 +95,7 @@ class TorrentListBase extends React.Component<IProps, IState> {
                 <TableRow>
                   <TableCell>Name</TableCell>
                   <TableCell>Size</TableCell>
+                  <TableCell>Download Rate</TableCell>
                   <TableCell>Percentage</TableCell>
                   <TableCell numeric>Seeders</TableCell>
                   <TableCell numeric>Leechers</TableCell>
@@ -114,6 +115,9 @@ class TorrentListBase extends React.Component<IProps, IState> {
                       </TableCell>
                       <TableCell className="size">
                         {bytesToSize(torrent.size)}
+                      </TableCell>
+                      <TableCell className="size">
+                        {bytesToSize(torrent.down_rate)}/s
                       </TableCell>
                       <TableCell className="progress">
                         <div>
