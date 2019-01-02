@@ -22,7 +22,7 @@ class Leekx {
             }
             $page++;
         }
-        while ($pageResults && count($pageResults) && count($results) < $limit && $page < 4);
+        while ($pageResults && count($pageResults) && count($results) < $limit);
 
         return $results;
     }

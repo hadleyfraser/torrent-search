@@ -27,7 +27,6 @@ class ThePirateBay {
        * @param {string} $keyword
        */
     public function search($keyword){
-        $page = 0;
         $keyword = rawurlencode(utf8_encode($keyword));
 
         $searchUrl = $this->url . "/search/$keyword/$page/99/0";
