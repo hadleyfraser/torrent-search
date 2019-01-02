@@ -146,8 +146,8 @@ class DownloadStation {
 
   private function dsStartTorrent($hash) {
     $url = sprintf($this->startTorrentEndpoint, $this->sid, $hash);
-    $paused = $this->make_call($url);
-    if ($paused->error) {
+    $started = $this->make_call($url);
+    if ($started->error) {
       json_die(sprintf('Error Starting Torrent: %d', $error), false);
     }
   }

@@ -7,7 +7,6 @@ class Kickass {
        * @param {string} $keyword
        */
     public function search($keyword){
-        $page = 0;
         $keyword = urlencode($keyword);
 
         $searchUrl = $this->url . "/usearch/$keyword/?field=seeders&sorder=desc";

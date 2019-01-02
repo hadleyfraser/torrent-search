@@ -12,7 +12,6 @@ import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import { EStatus, ITorrent, ITorrentWithStatus } from "src/interfaces";
 import { findTorrentToDownload } from "src/utils";
 import { addTorrent } from "src/utils/services";
-import { string } from "prop-types";
 
 interface IProps {
   className?: string;

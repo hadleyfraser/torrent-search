@@ -21,10 +21,10 @@ import {
   clearComplete,
   getTorrentList
 } from "src/utils/services";
+import { taskStatus } from "src/constants";
 import { IDownload } from "src/interfaces";
 import Modal from "src/components/Modal";
 import Action from "src/components/Action";
-import { taskStatus } from "src/constants";
 
 interface IProps {
   className?: string;
@@ -126,8 +126,6 @@ class TorrentListBase extends React.Component<IProps, IState> {
                     if (name.indexOf("magnet:") !== -1) {
                       name = `magnet: ${getNameFromMagent(name)}`;
                     }
-
-                    console.log(torrent.state, taskStatus.failed);
 
                     let torrentStatusClass = "incomplete";
                     if (torrent.state === taskStatus.failed) {
