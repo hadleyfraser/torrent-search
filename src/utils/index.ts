@@ -1,3 +1,4 @@
+import { qs } from "url-parse";
 import { taskStatus } from "src/constants";
 import { IDownload, ITorrent, ITorrentWithStatus } from "src/interfaces";
 
@@ -10,17 +11,6 @@ const bytesToSize = bytes => {
   return `${Math.round((bytes / Math.pow(1024, sizePosition)) * 100) / 100} ${
     sizes[sizePosition]
   }`;
-};
-
-const getTorrentStatus = (torrent: IDownload): string | boolean => {
-  switch (torrent.state) {
-    case taskStatus.paused:
-      return "Paused";
-    case taskStatus.stopped:
-      return "Stopped";
-    default:
-      return false;
-  }
 };
 
 const findTorrentToDownload = (
@@ -36,6 +26,29 @@ const findTorrentToDownload = (
   });
 
   return foundTorrent;
+};
+
+const getNameFromMagent = (magnet: string): string => {
+  const parsedUrl = qs.parse(magnet) as any;
+  if (parsedUrl.dn) {
+    return parsedUrl.dn;
+  }
+  return "";
+};
+
+const getTorrentStatus = (torrent: IDownload): string | boolean => {
+  switch (torrent.state) {
+    case taskStatus.paused:
+      return "Paused";
+    case taskStatus.stopped:
+      return "Stopped";
+    case taskStatus.failed:
+      return "Failed";
+    case taskStatus.queuing:
+      return "Waiting";
+    default:
+      return false;
+  }
 };
 
 const isTorrentSelected = (
@@ -78,6 +91,7 @@ const secondsToTime = (seconds: number): string => {
 export {
   bytesToSize,
   findTorrentToDownload,
+  getNameFromMagent,
   getTorrentStatus,
   isTorrentSelected,
   secondsToTime

@@ -10,7 +10,12 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-import { bytesToSize, secondsToTime, getTorrentStatus } from "src/utils";
+import {
+  bytesToSize,
+  secondsToTime,
+  getTorrentStatus,
+  getNameFromMagent
+} from "src/utils";
 import {
   changeTorrentStatus,
   clearComplete,
@@ -19,6 +24,7 @@ import {
 import { IDownload } from "src/interfaces";
 import Modal from "src/components/Modal";
 import Action from "src/components/Action";
+import { taskStatus } from "src/constants";
 
 interface IProps {
   className?: string;
@@ -116,16 +122,30 @@ class TorrentListBase extends React.Component<IProps, IState> {
                       torrent.state === 100 ? 100 : torrent.progress;
                     const complete = progress === 100;
 
+                    let name = torrent.source;
+                    if (name.indexOf("magnet:") !== -1) {
+                      name = `magnet: ${getNameFromMagent(name)}`;
+                    }
+
+                    console.log(torrent.state, taskStatus.failed);
+
+                    let torrentStatusClass = "incomplete";
+                    if (torrent.state === taskStatus.failed) {
+                      torrentStatusClass = "failed";
+                    } else if (complete) {
+                      torrentStatusClass = "complete";
+                    }
+
                     return (
                       <TableRow
                         key={torrent.source}
-                        className={complete ? "complete" : "incomplete"}
+                        className={torrentStatusClass}
                         onClick={
                           !complete ? this.handleTorrentClick(torrent) : null
                         }
                       >
                         <TableCell className="name">
-                          <span>{torrent.source}</span>
+                          <span>{name}</span>
                         </TableCell>
                         <TableCell className="size">
                           {bytesToSize(torrent.size)}
@@ -209,6 +229,16 @@ const TorrentList = styled(TorrentListBase)`
 
     .progress span:first-child {
       background: #069c06;
+    }
+  }
+
+  .failed {
+    .name {
+      color: red;
+    }
+
+    .progress span:first-child {
+      background: red;
     }
   }
 

@@ -97,7 +97,7 @@ class SearchResultsBase extends React.Component<IProps, IState> {
             {results
               .filter(
                 torrent =>
-                  torrent.peers &&
+                  torrent.seeds &&
                   torrent.name.toLowerCase().includes(filter.toLowerCase())
               )
               .map(torrent => (

@@ -6,13 +6,25 @@ class Leekx {
        * Search()
        * @param {string} $keyword
        */
-    public function search($keyword){
-        $page = 0;
+      public function search($keyword) {
+        $page = 1;
         $keyword = urlencode($keyword);
 
-        $searchUrl = $this->url . "/search/$keyword/1/";
-        $body = file_get_contents($searchUrl);
-        return $this->get_page_results($body);
+        $limit = 50;
+        $results = [];
+
+        do {
+            $searchUrl = sprintf('%s/search/%s/%s/', $this->url, $keyword, $page);
+            $body = file_get_contents($searchUrl);
+            $pageResults = $this->get_page_results($body);
+            if ($pageResults && count($pageResults)) {
+                $results = array_merge($results, $pageResults);
+            }
+            $page++;
+        }
+        while ($pageResults && count($pageResults) && count($results) < $limit && $page < 4);
+
+        return $results;
     }
 
     private function get_page_results($body) {
@@ -29,7 +41,7 @@ class Leekx {
             "<td class=\"coll-2 seeds\">(?P<seeds>\d+)</td>.*".
             "<td class=\"coll-3 leeches\">(?P<leechers>\d+)</td>.*".
             "<td class=\"coll-date\">(?P<time>.*)</td>.*".
-            "<td class=\"coll-4 size mob-uploader\">(?P<size>[^ ]+) +(?P<unit>[a-zA-Z]*)<span.*</span></td>.*".
+            "<td class=\"coll-4 size mob-(uploader|vip)\">(?P<size>[^ ]+) +(?P<unit>[a-zA-Z]*)<span.*</span></td>.*".
             "</tr>".
             "`siU",
             $body,

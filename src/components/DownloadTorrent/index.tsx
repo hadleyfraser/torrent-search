@@ -98,7 +98,9 @@ class DownloadTorrentBase extends React.Component<IProps, IState> {
       <Modal className={className} open onClose={close}>
         <DialogTitle>
           {addingTorrents.length
-            ? `Adding torrent${addingTorrents.length === 1} to Download Station`
+            ? `Adding torrent${
+                addingTorrents.length === 1 ? "s" : ""
+              } to Download Station`
             : `Are you sure you want to download ${
                 addingTorrents.length === 1 ? "the torrent" : "these torrents"
               }?`}
