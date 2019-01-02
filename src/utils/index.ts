@@ -1,5 +1,5 @@
 import { taskStatus } from "src/constants";
-import { IDownload } from "src/interfaces";
+import { IDownload, ITorrent, ITorrentWithStatus } from "src/interfaces";
 
 const bytesToSize = bytes => {
   const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
@@ -23,6 +23,39 @@ const getTorrentStatus = (torrent: IDownload): string | boolean => {
   }
 };
 
+const findTorrentToDownload = (
+  torrentList: ITorrent[],
+  link: string
+): ITorrentWithStatus => {
+  let foundTorrent = null;
+  torrentList.some(torrent => {
+    if (torrent.link === link) {
+      foundTorrent = torrent;
+      return true;
+    }
+  });
+
+  return foundTorrent;
+};
+
+const isTorrentSelected = (
+  torrent: ITorrent,
+  selectedTorrents: ITorrent[]
+): number => {
+  if (!torrent || !selectedTorrents) {
+    return -1;
+  }
+
+  let position = -1;
+  selectedTorrents.some((t, i) => {
+    if (t.link === torrent.link) {
+      position = i;
+      return true;
+    }
+  });
+  return position;
+};
+
 const secondsToTime = (seconds: number): string => {
   let remainingSeconds = seconds;
   const remainingHours = Math.floor(seconds / 60 / 60);
@@ -42,4 +75,10 @@ const secondsToTime = (seconds: number): string => {
     .padStart(2, "0")}`;
 };
 
-export { bytesToSize, getTorrentStatus, secondsToTime };
+export {
+  bytesToSize,
+  findTorrentToDownload,
+  getTorrentStatus,
+  isTorrentSelected,
+  secondsToTime
+};

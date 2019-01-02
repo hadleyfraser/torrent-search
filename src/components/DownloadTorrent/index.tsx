@@ -9,91 +9,136 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import CheckCircleOutline from "@material-ui/icons/CheckCircleOutline";
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
-import { ITorrent } from "src/interfaces";
+import { EStatus, ITorrent, ITorrentWithStatus } from "src/interfaces";
+import { findTorrentToDownload } from "src/utils";
 import { addTorrent } from "src/utils/services";
+import { string } from "prop-types";
 
 interface IProps {
+  className?: string;
   close: () => void;
-  torrent: ITorrent;
+  torrentList: ITorrent[];
 }
+
 interface IState {
-  isAdding: boolean;
-  response: string;
-  success: boolean;
+  addingTorrents: ITorrentWithStatus[];
 }
 
-const GreenBox = styled.div`
-  color: green;
+const IconContainer = styled.div<{ color?: string }>`
+  position: absolute;
+  top: 0;
+  right: 0;
+  ${({ color }) => (color ? `color: ${color};` : "")}
 `;
 
-const RedBox = styled.div`
-  color: red;
-`;
+const getStatusIcon = (status: EStatus) => {
+  let Icon = null;
+  let color = "";
+  switch (status) {
+    case EStatus.ADDING:
+      Icon = CircularProgress;
+      break;
+    case EStatus.ERROR:
+      Icon = ErrorOutline;
+      color = "red";
+      break;
+    case EStatus.SUCCESS:
+      Icon = CheckCircleOutline;
+      color = "green";
+      break;
+  }
 
-const DownloadStatus = styled.div`
-  margin-top: 20px;
-`;
+  return Icon ? (
+    <IconContainer color={color}>
+      <Icon size={20} />
+    </IconContainer>
+  ) : null;
+};
 
-class DownloadTorrent extends React.Component<IProps, IState> {
+class DownloadTorrentBase extends React.Component<IProps, IState> {
   public state = {
-    isAdding: false,
-    response: "",
-    success: true
+    addingTorrents: []
   };
 
-  private addTorrent = (type: string) => async () => {
-    const { torrent } = this.props;
-    this.setState({
-      isAdding: true
+  private addAllTorrents = (type: string) => () => {
+    const { torrentList } = this.props;
+    torrentList.forEach(torrent => {
+      this.addTorrent(type, torrent);
     });
+  };
+
+  private addTorrent = async (type: string, torrent: ITorrent) => {
+    this.setState(prevState => ({
+      addingTorrents: [
+        ...prevState.addingTorrents,
+        {
+          ...torrent,
+          status: EStatus.ADDING
+        }
+      ]
+    }));
     const response = await addTorrent(torrent, type);
-    this.setState({
-      isAdding: false,
-      response: response.data,
-      success: response.success
+    this.setState(prevState => {
+      const torrentList = [...prevState.addingTorrents];
+      torrentList.map(torr => {
+        if (torrent.link === torr.link) {
+          torr.status = response.success ? EStatus.SUCCESS : EStatus.ERROR;
+        }
+        return torr;
+      });
+      return { addingTorrents: torrentList };
     });
   };
 
   render() {
-    const { close, torrent } = this.props;
-    const { isAdding, response, success } = this.state;
-
-    const BoxColor = success ? GreenBox : RedBox;
-    const Icon = success ? CheckCircleOutline : ErrorOutline;
+    const { className, close, torrentList } = this.props;
+    const { addingTorrents } = this.state;
 
     return (
-      <Modal open onClose={close}>
+      <Modal className={className} open onClose={close}>
         <DialogTitle>
-          {isAdding
-            ? "Adding torrent to Download Station"
-            : "Are you sure you want to download the torrent?"}
+          {addingTorrents.length
+            ? `Adding torrent${addingTorrents.length === 1} to Download Station`
+            : `Are you sure you want to download ${
+                addingTorrents.length === 1 ? "the torrent" : "these torrents"
+              }?`}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>{torrent.name}</DialogContentText>
-          <DownloadStatus>
-            {isAdding ? (
-              <CircularProgress />
-            ) : response ? (
-              <BoxColor>
-                <Icon fontSize="large" />
-                <DialogContentText color="inherit">
-                  {response}
-                </DialogContentText>
-              </BoxColor>
-            ) : null}
-          </DownloadStatus>
+          {torrentList.map(torrent => {
+            const torrentWithStatus = findTorrentToDownload(
+              addingTorrents,
+              torrent.link
+            );
+
+            const status = torrentWithStatus && torrentWithStatus.status;
+
+            return (
+              <DialogContentText
+                key={torrent.link}
+                className="torrent-list"
+                align={status !== null ? "left" : "center"}
+              >
+                {torrent.name}
+                {getStatusIcon(status)}
+              </DialogContentText>
+            );
+          })}
         </DialogContent>
-        {!isAdding && !response ? (
+        {!addingTorrents.length ? (
           <DialogActions>
             <Button
-              onClick={this.addTorrent("Movies")}
+              onClick={this.addAllTorrents("Movies")}
               color="primary"
               autoFocus
             >
-              Download Movie
+              Download Movie{torrentList.length > 1 ? "s" : ""}
             </Button>
-            <Button onClick={this.addTorrent("TV")} color="primary" autoFocus>
-              Download TV Episode
+            <Button
+              onClick={this.addAllTorrents("TV")}
+              color="primary"
+              autoFocus
+            >
+              Download TV Episode{torrentList.length > 1 ? "s" : ""}
             </Button>
           </DialogActions>
         ) : null}
@@ -101,5 +146,12 @@ class DownloadTorrent extends React.Component<IProps, IState> {
     );
   }
 }
+
+const DownloadTorrent = styled(DownloadTorrentBase)`
+  .torrent-list {
+    position: relative;
+    padding-right: 30px;
+  }
+`;
 
 export default DownloadTorrent;

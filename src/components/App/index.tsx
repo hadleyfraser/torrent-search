@@ -27,7 +27,7 @@ interface IState {
   results: ITorrent[];
   resultsFound: boolean;
   search: string;
-  selectedTorrent: ITorrent;
+  selectedTorrents: ITorrent[];
   showDownloads: boolean;
   showModal: boolean;
   verifyingVPN: boolean;
@@ -41,8 +41,8 @@ class AppBase extends React.Component<IProps, IState> {
     results: [],
     resultsFound: false,
     search: "",
-    selectedTorrent: null,
-    showDownloads: true,
+    selectedTorrents: null,
+    showDownloads: false,
     showModal: false,
     verifyingVPN: true
   };
@@ -53,15 +53,15 @@ class AppBase extends React.Component<IProps, IState> {
     });
   };
 
-  public downloadTorrent = async (torrent: ITorrent) => {
+  public downloadTorrents = (torrentList: ITorrent[]) => {
     this.setState({
-      selectedTorrent: torrent
+      selectedTorrents: torrentList
     });
   };
 
   public torrentAdded = () => {
     this.setState({
-      selectedTorrent: null
+      selectedTorrents: null
     });
   };
 
@@ -78,7 +78,7 @@ class AppBase extends React.Component<IProps, IState> {
       isSearching,
       results,
       search,
-      selectedTorrent,
+      selectedTorrents,
       showDownloads,
       showModal,
       verifyingVPN
@@ -113,15 +113,15 @@ class AppBase extends React.Component<IProps, IState> {
               <SearchResults
                 filter={filter}
                 results={results}
-                downloadTorrent={this.downloadTorrent}
+                downloadTorrents={this.downloadTorrents}
               />
               <Modal open={!!showModal} onClose={this.hideModal}>
                 {!results.length ? <CircularProgress /> : null}
               </Modal>
-              {selectedTorrent ? (
+              {selectedTorrents ? (
                 <DownloadTorrent
                   close={this.torrentAdded}
-                  torrent={selectedTorrent}
+                  torrentList={selectedTorrents}
                 />
               ) : null}
             </>

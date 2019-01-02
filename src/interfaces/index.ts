@@ -3,15 +3,15 @@ interface IResponse {
 }
 
 interface ITorrent {
-  src: string;
-  link: string;
-  name: string;
-  size: number;
-  sizeText: string;
-  seeds: number;
-  peers: number;
-  category: string;
-  enclosure_url: string;
+  src?: string;
+  link?: string;
+  name?: string;
+  size?: number;
+  sizeText?: string;
+  seeds?: number;
+  peers?: number;
+  category?: string;
+  enclosure_url?: string;
 }
 
 type IAddTorrentResponse = IResponse & {
@@ -38,4 +38,21 @@ type ITorrentListResponse = IResponse & {
   };
 };
 
-export { IAddTorrentResponse, IDownload, ITorrent, ITorrentListResponse };
+enum EStatus {
+  ADDING,
+  ERROR,
+  SUCCESS
+}
+
+type ITorrentWithStatus = ITorrent & {
+  status?: EStatus;
+};
+
+export {
+  EStatus,
+  IAddTorrentResponse,
+  IDownload,
+  ITorrentWithStatus,
+  ITorrent,
+  ITorrentListResponse
+};
