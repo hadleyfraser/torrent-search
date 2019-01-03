@@ -14,7 +14,7 @@ import DownloadTorrent from "src/components/DownloadTorrent";
 import TorrentList from "src/components/TorrentList";
 import Action from "src/components/Action";
 
-const sites = ["leeks", "kickass"];
+const sites = ["leeks", "kickass", "piratebay"];
 
 interface IProps {
   className?: string;

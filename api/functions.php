@@ -37,33 +37,39 @@ function json_die($data, $success = true) {
     die(json_encode(['success' => $success, 'data' => $data]));
 }
 
-function search($search, $site, $dev) {
+function get_site_object($site) {
     switch($site) {
         case 'piratebay':
-            if ($dev) {
-                include 'stub/piratebay.php';
-                json_die($data);
-            }
-            $siteSearch = new ThePirateBay();
-            break;
+            return new ThePirateBay();
         case 'leeks':
-            if ($dev) {
-                sleep(1);
-                include 'stub/leeks.php';
-                json_die($data);
-            }
-            $siteSearch = new Leekx();
-            break;
+            return new Leekx();
         case 'kickass':
-            if ($dev) {
-                sleep(2);
-                include 'stub/kickass.php';
-                json_die($data);
-            }
-            $siteSearch = new Kickass();
-            break;
+            return new Kickass();
+    }
+}
+
+function output_dev_search($site) {
+    switch($site) {
+        case 'piratebay':
+            include 'stub/piratebay.php';
+            json_die($data);
+        case 'leeks':
+            sleep(1);
+            include 'stub/leeks.php';
+            json_die($data);
+        case 'kickass':
+            sleep(2);
+            include 'stub/kickass.php';
+            json_die($data);
+    }
+}
+
+function search($search, $site, $dev) {
+    if ($dev) {
+        output_dev_search($site);
     }
 
+    $siteSearch = get_site_object($site);
     if (!$siteSearch) {
         json_die(false, false);
     }
@@ -80,9 +86,21 @@ function download($url, $site, $type, $dev) {
         json_die('Torrent Added');
     }
 
-    if ($site === '1337x') {
-        $leekx = new Leekx();
-        $url = $leekx->get_download_link($url);
+    if (strpos($url, 'magnet') === false) {
+        $siteSearch = get_site_object($site);
+        if (!$siteSearch) {
+            json_die('No ' . $site . ' class found', false);
+        }
+
+        // hide any error messages
+        ob_start();
+        $downloadUrl = $siteSearch->get_download_link($url);
+        ob_end_clean();
+
+        if (!$downloadUrl) {
+            json_die('No Torrent URL Found at url: ' . $url, false);
+        }
+        $url = $downloadUrl;
     }
 
     $ds = new DownloadStation();
