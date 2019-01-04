@@ -55,7 +55,7 @@ class Leekx {
         for ($i = 0; $i < $len; ++$i) {
             $tlink = new stdClass();
 
-            $tlink->src = "1337x";
+            $tlink->src = "leeks";
             $tlink->link = $this->url . $result["link"][$i];
             $tlink->name = strip_tags($result["name"][$i]);
             $tlink->size = ($result["size"][$i] + 0) * unit_size($result["unit"][$i]);

@@ -100,9 +100,9 @@ class SearchResultsBase extends React.Component<IProps, IState> {
                   torrent.seeds &&
                   torrent.name.toLowerCase().includes(filter.toLowerCase())
               )
-              .map(torrent => (
+              .map((torrent, i) => (
                 <TableRow
-                  key={torrent.link}
+                  key={`${i}-${torrent.link}`}
                   onClick={this.handleTorrentClick(torrent)}
                   className={
                     isTorrentSelected(torrent, selectedTorrents) !== -1
