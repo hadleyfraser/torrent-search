@@ -32,6 +32,8 @@ const getNameFromMagent = (magnet: string): string => {
   const parsedUrl = qs.parse(magnet) as any;
   if (parsedUrl.dn) {
     return parsedUrl.dn;
+  } else if (parsedUrl["amp;dn"]) {
+    return parsedUrl["amp;dn"];
   }
   return "";
 };
