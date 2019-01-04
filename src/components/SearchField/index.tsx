@@ -17,7 +17,13 @@ const Loader = styled.div`
 const SearchFieldBase = ({ className, loading, onFilter, ...rest }) => {
   return (
     <div className={className}>
-      <TextField label="Search Torrents" margin="normal" fullWidth {...rest} />
+      <TextField
+        label="Search Torrents"
+        margin="normal"
+        fullWidth
+        autoFocus
+        {...rest}
+      />
       <Filter>
         <TextField label="Filter Results" margin="normal" onChange={onFilter} />
         {loading && (
