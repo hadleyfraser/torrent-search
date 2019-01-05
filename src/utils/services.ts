@@ -61,7 +61,13 @@ const changeTorrentStatus = async (
     const response = await axios.get(
       changeStatusUrl
         .replace("{hash}", torrent.hash)
-        .replace("{status}", (torrent.state === taskStatus.paused).toString())
+        .replace(
+          "{status}",
+          (
+            torrent.state === taskStatus.paused ||
+            torrent.state === taskStatus.failed
+          ).toString()
+        )
     );
     return response.data;
   } catch (e) {

@@ -215,9 +215,12 @@ const TorrentList = styled(TorrentListBase)`
     transition: 0.2s all;
   }
 
-  .incomplete:hover {
-    background: #eee;
-    cursor: pointer;
+  .incomplete,
+  .failed {
+    &:hover {
+      background: #eee;
+      cursor: pointer;
+    }
   }
 
   .complete {
