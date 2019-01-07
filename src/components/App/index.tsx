@@ -2,19 +2,20 @@ import * as React from "react";
 import styled from "styled-components";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import CloudDownload from "@material-ui/icons/CloudDownload";
+import SettingsIcon from "@material-ui/icons/Settings";
 import Typography from "@material-ui/core/Typography";
 import * as _ from "lodash";
 import { torrentSearch } from "src/utils/services";
-import { ITorrent } from "src/interfaces";
+import { ISiteSetting, ITorrent } from "src/interfaces";
 import SearchResults from "src/components/SearchResults";
 import SearchField from "src/components/SearchField";
 import Modal from "src/components/Modal";
 import VerifyVPN from "src/components/VerifyVPN";
 import DownloadTorrent from "src/components/DownloadTorrent";
 import TorrentList from "src/components/TorrentList";
+import ActionList from "src/components/ActionList";
 import Action from "src/components/Action";
-
-const sites = ["leeks", "kickass", "piratebay"];
+import Settings from "src/components/Settings";
 
 interface IProps {
   className?: string;
@@ -30,6 +31,8 @@ interface IState {
   selectedTorrents: ITorrent[];
   showDownloads: boolean;
   showModal: boolean;
+  showSettings: boolean;
+  siteList: ISiteSetting[];
   verifyingVPN: boolean;
 }
 
@@ -44,6 +47,12 @@ class AppBase extends React.Component<IProps, IState> {
     selectedTorrents: null,
     showDownloads: false,
     showModal: false,
+    showSettings: false,
+    siteList: [
+      { title: "1337x", name: "leeks", active: true },
+      { title: "Kickass Torrents", name: "kickass", active: true },
+      { title: "The Pirate Bay", name: "piratebay", active: true }
+    ],
     verifyingVPN: true
   };
 
@@ -71,6 +80,25 @@ class AppBase extends React.Component<IProps, IState> {
     });
   };
 
+  public hideSettings = () => {
+    this.setState({ showSettings: false });
+  };
+
+  public toggleSiteActive = (siteName: string) => (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { siteList } = this.state;
+    const newSiteList = _.cloneDeep(siteList);
+    newSiteList.forEach(site => {
+      if (site.name === siteName) {
+        site.active = event.target.checked;
+      }
+    });
+    this.setState({
+      siteList: newSiteList
+    });
+  };
+
   public render() {
     const { className } = this.props;
     const {
@@ -81,6 +109,8 @@ class AppBase extends React.Component<IProps, IState> {
       selectedTorrents,
       showDownloads,
       showModal,
+      showSettings,
+      siteList,
       verifyingVPN
     } = this.state;
 
@@ -90,13 +120,14 @@ class AppBase extends React.Component<IProps, IState> {
           <Typography variant="h3" gutterBottom>
             Torrent Search
           </Typography>
-          <Action
-            onClick={this.showDownloads}
-            color="#05bb05"
-            hoverColor="#069c06"
-          >
-            <CloudDownload />
-          </Action>
+          <ActionList>
+            <Action color="#05bb05" onClick={this.showDownloads}>
+              <CloudDownload />
+            </Action>
+            <Action color="#a9a9a9" onClick={this.showSettings}>
+              <SettingsIcon />
+            </Action>
+          </ActionList>
         </header>
         <main>
           {verifyingVPN ? (
@@ -127,6 +158,13 @@ class AppBase extends React.Component<IProps, IState> {
             </>
           )}
           {showDownloads && <TorrentList closeModal={this.hideDownloads} />}
+          {showSettings && (
+            <Settings
+              hideSettings={this.hideSettings}
+              sites={siteList}
+              toggleSite={this.toggleSiteActive}
+            />
+          )}
         </main>
       </div>
     );
@@ -170,7 +208,7 @@ class AppBase extends React.Component<IProps, IState> {
       results: []
     });
 
-    const { search } = this.state;
+    const { search, siteList } = this.state;
 
     if (!search) {
       return;
@@ -182,12 +220,15 @@ class AppBase extends React.Component<IProps, IState> {
       results: [],
       showModal: true
     });
+
     let sitesComplete = 0;
-    sites.forEach(site => {
-      torrentSearch(search, site).then(response => {
+    const activeSites = siteList.filter(site => site.active);
+
+    activeSites.forEach(site => {
+      torrentSearch(search, site.name).then(response => {
         this.addResults(response);
         sitesComplete++;
-        if (sitesComplete === sites.length) {
+        if (sitesComplete === activeSites.length) {
           this.setState({
             isSearching: false,
             isLoading: false,
@@ -201,6 +242,12 @@ class AppBase extends React.Component<IProps, IState> {
   private showDownloads = () => {
     this.setState({
       showDownloads: true
+    });
+  };
+
+  private showSettings = () => {
+    this.setState({
+      showSettings: true
     });
   };
 

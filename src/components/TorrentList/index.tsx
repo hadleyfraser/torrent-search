@@ -25,6 +25,7 @@ import { taskStatus } from "src/constants";
 import { IDownload } from "src/interfaces";
 import Modal from "src/components/Modal";
 import Action from "src/components/Action";
+import ActionList from "../ActionList";
 
 interface IProps {
   className?: string;
@@ -94,13 +95,18 @@ class TorrentListBase extends React.Component<IProps, IState> {
             <Typography variant="h5" gutterBottom>
               Currently Downloading
             </Typography>
-            <Action
-              color="red"
-              hardRight
-              onClick={!showSpinner ? this.clearComplete : null}
-            >
-              {showSpinner ? <CircularProgress size={loaderSize} /> : <Block />}
-            </Action>
+            <ActionList hardRight>
+              <Action
+                color="red"
+                onClick={!showSpinner ? this.clearComplete : null}
+              >
+                {showSpinner ? (
+                  <CircularProgress size={loaderSize} />
+                ) : (
+                  <Block />
+                )}
+              </Action>
+            </ActionList>
           </Header>
           <Paper>
             <Table>

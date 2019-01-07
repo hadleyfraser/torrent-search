@@ -1,11 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
+import { tintColor } from "src/utils";
 
 interface IProps {
   className?: string;
   color: string;
   hardRight?: boolean;
-  hoverColor?: string;
   onClick?: () => void;
 }
 
@@ -16,19 +16,17 @@ const ActionBase: React.SFC<IProps> = ({ children, className, onClick }) => (
 );
 
 const Action = styled(ActionBase)`
-  position: absolute;
-  top: 50%;
-  right: ${({ hardRight }) => (hardRight ? "0" : "20px")};
-  transform: translateY(-50%);
-  color: ${({ color }) => color || ""};
+  display: inline;
+  color: ${({ color }) => color};
   transition: 0.2s all;
-  ${({ onClick }) => (onClick ? "cursor: pointer" : "")}
-  ${({ hoverColor }) =>
-    hoverColor
+  ${({ color, onClick }) =>
+    onClick
       ? `
-        &:hover {
-          color: ${hoverColor};
-        }`
+      cursor: pointer
+      &:hover {
+        color: ${tintColor(color, -10)};
+      }
+      `
       : ""}
 `;
 

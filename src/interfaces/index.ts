@@ -1,3 +1,9 @@
+interface ISiteSetting {
+  active: boolean;
+  name: string;
+  title: string;
+}
+
 interface IResponse {
   success: boolean;
 }
@@ -52,6 +58,7 @@ export {
   EStatus,
   IAddTorrentResponse,
   IDownload,
+  ISiteSetting,
   ITorrentWithStatus,
   ITorrent,
   ITorrentListResponse
