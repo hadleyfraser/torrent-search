@@ -2,13 +2,20 @@ import * as React from "react";
 import styled from "styled-components";
 import MUIModal, { ModalProps } from "@material-ui/core/Modal";
 
+interface IProps {
+  small?: boolean;
+}
+
 const ModalContent = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   max-height: 80%;
-  min-width: 250px;
+  ${(props: IProps) => {
+    console.log(props);
+    return !props.small ? "min-width: 250px;" : "";
+  }}
   overflow: auto;
   background: #fff;
   border-radius: 5px;
@@ -18,9 +25,13 @@ const ModalContent = styled.div`
   word-break: break-all;
 `;
 
-const Modal: React.SFC<ModalProps> = ({ children, ...modalProps }) => (
+const Modal: React.SFC<ModalProps & IProps> = ({
+  children,
+  small,
+  ...modalProps
+}) => (
   <MUIModal {...modalProps}>
-    <ModalContent>{children}</ModalContent>
+    <ModalContent small={small}>{children}</ModalContent>
   </MUIModal>
 );
 

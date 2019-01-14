@@ -146,7 +146,7 @@ class AppBase extends React.Component<IProps, IState> {
                 results={results}
                 downloadTorrents={this.downloadTorrents}
               />
-              <Modal open={!!showModal} onClose={this.hideModal}>
+              <Modal open={!!showModal} onClose={this.hideModal} small={true}>
                 {!results.length ? <CircularProgress /> : null}
               </Modal>
               {selectedTorrents ? (

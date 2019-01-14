@@ -20,7 +20,7 @@ const Settings: React.SFC<IProps> = ({ toggleSite, hideSettings, sites }) => (
     <Typography variant="h5" gutterBottom>
       Settings
     </Typography>
-    <FormLabel>Active Sites</FormLabel>
+    <FormLabel>Active Search Engines</FormLabel>
     <FormGroup>
       {sites.map(site => (
         <FormControlLabel
