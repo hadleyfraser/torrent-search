@@ -8,6 +8,7 @@ const ModalContent = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   max-height: 80%;
+  min-width: 250px;
   overflow: auto;
   background: #fff;
   border-radius: 5px;

@@ -1,5 +1,5 @@
 import * as React from "react";
-import DialogTitle from "@material-ui/core/DialogTitle";
+import Typography from "@material-ui/core/Typography";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormLabel from "@material-ui/core/FormLabel";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -17,7 +17,9 @@ interface IProps {
 
 const Settings: React.SFC<IProps> = ({ toggleSite, hideSettings, sites }) => (
   <Modal open onClose={hideSettings}>
-    <DialogTitle>Settings</DialogTitle>
+    <Typography variant="h5" gutterBottom>
+      Settings
+    </Typography>
     <FormLabel>Active Sites</FormLabel>
     <FormGroup>
       {sites.map(site => (
