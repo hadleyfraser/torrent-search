@@ -2,6 +2,7 @@ import axios from "axios";
 import {
   IAddTorrentResponse,
   IDownload,
+  ISearchResponse,
   ITorrent,
   ITorrentListResponse
 } from "src/interfaces";
@@ -78,10 +79,10 @@ const changeTorrentStatus = async (
 const torrentSearch = async (
   search: string,
   site: string
-): Promise<ITorrent[]> => {
+): Promise<ISearchResponse> => {
   if (search) {
     const response = await axios.get(`${searchUrl}${search}&site=${site}`);
-    return response.data.data;
+    return { data: response.data.data, search };
   } else {
     throw new Error("Search Term Missing");
   }

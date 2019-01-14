@@ -226,7 +226,11 @@ class AppBase extends React.Component<IProps, IState> {
 
     activeSites.forEach(site => {
       torrentSearch(search, site.name).then(response => {
-        this.addResults(response);
+        if (this.state.search !== response.search) {
+          return;
+        }
+
+        this.addResults(response.data);
         sitesComplete++;
         if (sitesComplete === activeSites.length) {
           this.setState({

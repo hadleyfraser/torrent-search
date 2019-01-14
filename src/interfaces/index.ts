@@ -20,6 +20,11 @@ interface ITorrent {
   enclosure_url: string;
 }
 
+interface ISearchResponse {
+  data: ITorrent[];
+  search: string;
+}
+
 type IAddTorrentResponse = IResponse & {
   data: string;
   success: boolean;
@@ -58,6 +63,7 @@ export {
   EStatus,
   IAddTorrentResponse,
   IDownload,
+  ISearchResponse,
   ISiteSetting,
   ITorrentWithStatus,
   ITorrent,
