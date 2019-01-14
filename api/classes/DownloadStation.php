@@ -70,11 +70,13 @@ class DownloadStation {
   public function clearCompleteTorrents() {
     $this->dsLogin();
     $torrentList = $this->dsGetTorrentList();
+    $torrentsToRemove = [];
     foreach($torrentList->data as $torrent) {
       if ($torrent->state === 100 || $torrent->progress === 100) {
-        $this->dsRemoveTorrent($torrent->hash);
+        $torrentsToRemove[] = $torrent->hash;
       }
     }
+    $this->dsRemoveMultipleTorrents($torrentsToRemove);
     $torrentList = $this->dsGetTorrentList();
     $this->dsLogout();
     json_die($torrentList);
@@ -154,6 +156,11 @@ class DownloadStation {
 
   private function dsRemoveTorrent($hash) {
     $url = sprintf($this->removeTorrentEndpoint, $this->sid, $hash);
+    $removed = $this->make_call($url);
+  }
+
+  private function dsRemoveMultipleTorrents($hashList) {
+    $url = sprintf($this->removeTorrentEndpoint, $this->sid, implode('&hash=', $hashList));
     $removed = $this->make_call($url);
   }
 }
