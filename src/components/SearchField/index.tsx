@@ -3,6 +3,15 @@ import styled from "styled-components";
 import TextField from "@material-ui/core/TextField";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
+interface IProps {
+  className?: string;
+  loading: boolean;
+  onChange: (e) => void;
+  onFilter: (e) => void;
+  search: () => void;
+  value: string;
+}
+
 const Filter = styled.div`
   display: flex;
   width: 200px;
@@ -14,7 +23,19 @@ const Loader = styled.div`
   margin-left: 20px;
 `;
 
-const SearchFieldBase = ({ className, loading, onFilter, ...rest }) => {
+const SearchFieldBase: React.SFC<IProps> = ({
+  className,
+  loading,
+  onFilter,
+  search,
+  ...rest
+}) => {
+  const handleSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.keyCode === 13) {
+      search();
+    }
+  };
+
   return (
     <div className={className}>
       <TextField
@@ -22,10 +43,16 @@ const SearchFieldBase = ({ className, loading, onFilter, ...rest }) => {
         margin="normal"
         fullWidth
         autoFocus
+        onKeyUp={handleSubmit}
         {...rest}
       />
       <Filter>
-        <TextField label="Filter Results" margin="normal" onChange={onFilter} />
+        <TextField
+          label="Filter Results"
+          margin="normal"
+          onChange={onFilter}
+          onKeyUp={handleSubmit}
+        />
         {loading && (
           <Loader>
             <CircularProgress size={30} />

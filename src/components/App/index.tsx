@@ -136,7 +136,7 @@ class AppBase extends React.Component<IProps, IState> {
             <>
               <SearchField
                 loading={isSearching}
-                onKeyUp={e => e.keyCode === 13 && this.handleSubmit()}
+                search={this.handleSubmit}
                 onChange={this.handleSearchChange}
                 onFilter={this.handleFilter}
                 value={search}
@@ -199,8 +199,8 @@ class AppBase extends React.Component<IProps, IState> {
     });
   };
 
-  private handleSearchChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    this.setState({ search: (e.target as HTMLInputElement).value });
+  private handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ search: e.target.value });
   };
 
   private handleSubmit = async () => {
