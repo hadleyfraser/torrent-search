@@ -177,7 +177,7 @@ class TorrentListBase extends React.Component<IProps, IState> {
                       </TableRow>
                     );
                   })}
-                {!initialLoad && torrentList && torrentList.length && (
+                {!initialLoad && torrentList && torrentList.length ? (
                   <TableRow>
                     <TableCell />
                     <TableCell>
@@ -188,7 +188,7 @@ class TorrentListBase extends React.Component<IProps, IState> {
                     </TableCell>
                     <TableCell colSpan={4} />
                   </TableRow>
-                )}
+                ) : null}
               </TableBody>
             </Table>
           </Paper>
