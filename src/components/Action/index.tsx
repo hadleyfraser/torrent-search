@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { tintColor } from "src/utils";
 
 interface IProps {
+  children?: React.ReactNode;
   className?: string;
   color: string;
   hardRight?: boolean;
