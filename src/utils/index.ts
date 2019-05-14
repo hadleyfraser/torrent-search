@@ -38,6 +38,13 @@ const getNameFromMagent = (magnet: string): string => {
   return "";
 };
 
+const getTorrentName = (name: string) => {
+  if (name.indexOf("magnet:") !== -1) {
+    return `magnet: ${getNameFromMagent(name)}`;
+  }
+  return name;
+};
+
 const getTorrentStatus = (torrent: IDownload): string | boolean => {
   switch (torrent.state) {
     case taskStatus.paused:
@@ -120,7 +127,7 @@ const tintColor = (color: string, percent: number): string => {
 export {
   bytesToSize,
   findTorrentToDownload,
-  getNameFromMagent,
+  getTorrentName,
   getTorrentStatus,
   isTorrentSelected,
   secondsToTime,

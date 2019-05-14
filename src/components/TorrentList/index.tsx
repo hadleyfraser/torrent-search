@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { sumBy } from "lodash";
 import Block from "@material-ui/icons/Block";
+import DeleteForever from "@material-ui/icons/DeleteForever";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -14,7 +15,7 @@ import {
   bytesToSize,
   secondsToTime,
   getTorrentStatus,
-  getNameFromMagent
+  getTorrentName
 } from "src/utils";
 import {
   changeTorrentStatus,
@@ -26,6 +27,7 @@ import { IDownload } from "src/interfaces";
 import Modal from "src/components/Modal";
 import Action from "src/components/Action";
 import ActionList from "../ActionList";
+import DeleteTorrent from "../DeleteTorrent";
 
 interface IProps {
   className?: string;
@@ -33,6 +35,7 @@ interface IProps {
 }
 
 interface IState {
+  confirmDelete: IDownload;
   isClearing: boolean;
   initialLoad: boolean;
   isLoading: boolean;
@@ -49,6 +52,7 @@ const loaderSize = 25;
 class TorrentListBase extends React.Component<IProps, IState> {
   private mounted = false;
   public state = {
+    confirmDelete: null,
     isClearing: false,
     initialLoad: true,
     isLoading: false,
@@ -84,115 +88,138 @@ class TorrentListBase extends React.Component<IProps, IState> {
 
   render() {
     const { className, closeModal } = this.props;
-    const { isClearing, initialLoad, isLoading, torrentList } = this.state;
+    const {
+      confirmDelete,
+      isClearing,
+      initialLoad,
+      isLoading,
+      torrentList
+    } = this.state;
 
     const showSpinner = isClearing || isLoading || initialLoad;
 
     return (
       <Modal open onClose={closeModal}>
-        <div className={className}>
-          <Header>
-            <Typography variant="h5" gutterBottom>
-              Currently Downloading
-            </Typography>
-            <ActionList hardRight>
-              <Action
-                color="red"
-                onClick={!showSpinner ? this.clearComplete : null}
-              >
-                {showSpinner ? (
-                  <CircularProgress size={loaderSize} />
-                ) : (
-                  <Block />
-                )}
-              </Action>
-            </ActionList>
-          </Header>
-          <Paper>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Size</TableCell>
-                  <TableCell>Download Rate</TableCell>
-                  <TableCell>Percentage</TableCell>
-                  <TableCell>ETA</TableCell>
-                  <TableCell numeric>Seeders</TableCell>
-                  <TableCell numeric>Leechers</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {torrentList &&
-                  torrentList.map((torrent: IDownload) => {
-                    const progress =
-                      torrent.state === 100 ? 100 : torrent.progress;
-                    const complete = progress === 100;
-
-                    let name = torrent.source;
-                    if (name.indexOf("magnet:") !== -1) {
-                      name = `magnet: ${getNameFromMagent(name)}`;
-                    }
-
-                    let torrentStatusClass = "incomplete";
-                    if (torrent.state === taskStatus.failed) {
-                      torrentStatusClass = "failed";
-                    } else if (complete) {
-                      torrentStatusClass = "complete";
-                    }
-
-                    return (
-                      <TableRow
-                        key={torrent.source}
-                        className={torrentStatusClass}
-                        onClick={
-                          !complete ? this.handleTorrentClick(torrent) : null
-                        }
-                      >
-                        <TableCell className="name">
-                          <span>{name}</span>
-                        </TableCell>
-                        <TableCell className="size">
-                          {bytesToSize(torrent.size)}
-                        </TableCell>
-                        <TableCell className="size">
-                          {bytesToSize(torrent.down_rate)}/s
-                        </TableCell>
-                        <TableCell className="progress">
-                          <div>
-                            <span
-                              style={{
-                                width: `${progress}%`
-                              }}
-                            />
-                            <span>
-                              {getTorrentStatus(torrent) || `${progress}%`}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell numeric>
-                          {torrent.eta > 0 ? secondsToTime(torrent.eta) : 0}
-                        </TableCell>
-                        <TableCell numeric>{torrent.seeds}</TableCell>
-                        <TableCell numeric>{torrent.peers}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-                {!initialLoad && torrentList && torrentList.length ? (
+        {confirmDelete ? (
+          <DeleteTorrent
+            torrent={confirmDelete}
+            closeModal={this.clearConfirmDelete}
+          />
+        ) : (
+          <div className={className}>
+            <Header>
+              <Typography variant="h5" gutterBottom>
+                Currently Downloading
+              </Typography>
+              <ActionList hardRight>
+                <Action
+                  color="red"
+                  onClick={!showSpinner ? this.clearComplete : null}
+                >
+                  {showSpinner ? (
+                    <CircularProgress size={loaderSize} />
+                  ) : (
+                    <Block />
+                  )}
+                </Action>
+              </ActionList>
+            </Header>
+            <Paper>
+              <Table>
+                <TableHead>
                   <TableRow>
-                    <TableCell />
-                    <TableCell>
-                      <strong>Total Rate</strong>
-                    </TableCell>
-                    <TableCell className="size">
-                      {bytesToSize(sumBy(torrentList, "down_rate"))}/s
-                    </TableCell>
-                    <TableCell colSpan={4} />
+                    <TableCell>Name</TableCell>
+                    <TableCell>Size</TableCell>
+                    <TableCell>Download Rate</TableCell>
+                    <TableCell>Percentage</TableCell>
+                    <TableCell>ETA</TableCell>
+                    <TableCell numeric>Seeders</TableCell>
+                    <TableCell numeric>Leechers</TableCell>
+                    <TableCell numeric>Remove</TableCell>
                   </TableRow>
-                ) : null}
-              </TableBody>
-            </Table>
-          </Paper>
-        </div>
+                </TableHead>
+                <TableBody>
+                  {torrentList &&
+                    torrentList.map((torrent: IDownload) => {
+                      const progress =
+                        torrent.state === 100 ? 100 : torrent.progress;
+                      const complete = progress === 100;
+
+                      let torrentStatusClass = "incomplete";
+                      let showRemoveIcon = false;
+                      if (torrent.state === taskStatus.failed) {
+                        torrentStatusClass = "failed";
+                        showRemoveIcon = true;
+                      } else if (torrent.state === taskStatus.paused) {
+                        showRemoveIcon = true;
+                      } else if (complete) {
+                        torrentStatusClass = "complete";
+                      }
+
+                      return (
+                        <TableRow
+                          key={torrent.source}
+                          className={torrentStatusClass}
+                          onClick={
+                            !complete ? this.handleTorrentClick(torrent) : null
+                          }
+                        >
+                          <TableCell className="name">
+                            <span>{getTorrentName(torrent.source)}</span>
+                          </TableCell>
+                          <TableCell className="size">
+                            {bytesToSize(torrent.size)}
+                          </TableCell>
+                          <TableCell className="size">
+                            {bytesToSize(torrent.down_rate)}/s
+                          </TableCell>
+                          <TableCell className="progress">
+                            <div>
+                              <span
+                                style={{
+                                  width: `${progress}%`
+                                }}
+                              />
+                              <span>
+                                {getTorrentStatus(torrent) || `${progress}%`}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell numeric>
+                            {torrent.eta > 0 ? secondsToTime(torrent.eta) : 0}
+                          </TableCell>
+                          <TableCell numeric>{torrent.seeds}</TableCell>
+                          <TableCell numeric>{torrent.peers}</TableCell>
+                          <TableCell>
+                            {showRemoveIcon && (
+                              <Action
+                                color="red"
+                                onClick={this.showConfirmDelete(torrent)}
+                              >
+                                <DeleteForever />
+                              </Action>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  {!initialLoad && torrentList && torrentList.length ? (
+                    <TableRow>
+                      <TableCell />
+                      <TableCell>
+                        <strong>Total Rate</strong>
+                      </TableCell>
+                      <TableCell className="size">
+                        {bytesToSize(sumBy(torrentList, "down_rate"))}/s
+                      </TableCell>
+                      <TableCell colSpan={5} />
+                    </TableRow>
+                  ) : null}
+                </TableBody>
+              </Table>
+            </Paper>
+          </div>
+        )}
       </Modal>
     );
   }
@@ -211,6 +238,24 @@ class TorrentListBase extends React.Component<IProps, IState> {
     this.setState({ isLoading: true });
     const torrentList = await changeTorrentStatus(torrent);
     this.setState({ isLoading: false, torrentList: torrentList.data.data });
+  };
+
+  private showConfirmDelete = (torrent: IDownload) => (
+    e: React.MouseEvent<HTMLElement>
+  ) => {
+    e.stopPropagation();
+    this.setState({ confirmDelete: torrent });
+  };
+
+  private clearConfirmDelete = (torrentList?: IDownload[]) => {
+    const newState = {
+      confirmDelete: null,
+      torrentList
+    };
+    if (!torrentList) {
+      delete newState.torrentList;
+    }
+    this.setState(newState);
   };
 }
 

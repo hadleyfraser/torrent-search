@@ -31,6 +31,9 @@ switch($action) {
     case 'change-status':
         changeTorrentStatus($hash, $isPaused, $dev);
     break;
+    case 'force-delete-torrent':
+        forceDeleteTorrent($hash, $dev);
+    break;
 }
 
 json_die('', false);

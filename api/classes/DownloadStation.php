@@ -21,6 +21,7 @@ class DownloadStation {
     $this->removeTorrentEndpoint = sprintf('%s/%s', $env->baseUrl, $env->removeTorrent);
     $this->pauseTorrentEndpoint = sprintf('%s/%s', $env->baseUrl, $env->pauseTorrent);
     $this->startTorrentEndpoint = sprintf('%s/%s', $env->baseUrl, $env->startTorrent);
+    $this->forceDeleteTorrentEndpoint = sprintf('%s/%s', $env->baseUrl, $env->forceDeleteTorrent);
   }
 
   private function make_call($url, $requestType = 'GET') {
@@ -94,6 +95,14 @@ class DownloadStation {
     json_die($torrentList);
   }
 
+  public function forceDeleteTorrent($hash) {
+    $this->dsLogin();
+    $this->dsForceDeleteTorrent($hash);
+    $torrentList = $this->dsGetTorrentList();
+    $this->dsLogout();
+    json_die($torrentList);
+  }
+
   private function dsAddTorrent($torrentUrl, $type) {
     $url = sprintf($this->addTorrentEndpoint, $type, urlencode($torrentUrl), $this->sid);
     $added = $this->make_call($url, 'POST');
@@ -161,6 +170,11 @@ class DownloadStation {
 
   private function dsRemoveMultipleTorrents($hashList) {
     $url = sprintf($this->removeTorrentEndpoint, $this->sid, implode('&hash=', $hashList));
+    $removed = $this->make_call($url);
+  }
+
+  private function dsForceDeleteTorrent($hash) {
+    $url = sprintf($this->forceDeleteTorrentEndpoint, $this->sid, $hash);
     $removed = $this->make_call($url);
   }
 }

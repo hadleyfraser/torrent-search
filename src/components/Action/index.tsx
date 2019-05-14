@@ -7,7 +7,7 @@ interface IProps {
   className?: string;
   color: string;
   hardRight?: boolean;
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
 }
 
 const ActionBase: React.SFC<IProps> = ({ children, className, onClick }) => (

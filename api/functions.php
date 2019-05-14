@@ -115,8 +115,7 @@ function downloadList($dev) {
     }
 
     $ds = new DownloadStation();
-    $downloadList = $ds->getTorrentList();
-    json_die($downloadList);
+    $ds->getTorrentList();
 }
 
 function clearCompleteTorrents($dev) {
@@ -128,8 +127,7 @@ function clearCompleteTorrents($dev) {
     }
 
     $ds = new DownloadStation();
-    $downloadList = $ds->clearCompleteTorrents();
-    json_die($downloadList);
+    $ds->clearCompleteTorrents();
 }
 
 function changeTorrentStatus($hash, $isPaused, $dev) {
@@ -140,6 +138,16 @@ function changeTorrentStatus($hash, $isPaused, $dev) {
     }
 
     $ds = new DownloadStation();
-    $downloadList = $ds->changeTorrentStatus($hash, $isPaused);
-    json_die($downloadList);
+    $ds->changeTorrentStatus($hash, $isPaused);
+}
+
+function forceDeleteTorrent($hash, $dev) {
+    if ($dev) {
+        $downloadList = json_decode(file_get_contents(__DIR__ . '/stub/download-list.json'));
+        array_pop($downloadList->data);
+        json_die($downloadList);
+    }
+
+    $ds = new DownloadStation();
+    $ds->forceDeleteTorrent($hash);
 }

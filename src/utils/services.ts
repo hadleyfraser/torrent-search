@@ -19,6 +19,7 @@ const torrentUrl = `${baseUrl}download&url={url}&site={site}&type={type}`;
 const torrentListUrl = `${baseUrl}download-list`;
 const clearTorrentListUrl = `${baseUrl}clear-completed`;
 const changeStatusUrl = `${baseUrl}change-status&hash={hash}&isPaused={status}`;
+const deleteTorrentUrl = `${baseUrl}force-delete-torrent&hash={hash}`;
 
 const addTorrent = async (
   torrent: ITorrent,
@@ -43,6 +44,19 @@ const clearComplete = async (): Promise<ITorrentListResponse> => {
     return response.data;
   } catch (e) {
     throw new Error("Could not clear completed torrents");
+  }
+};
+
+const deleteTorrent = async (
+  torrent: IDownload
+): Promise<ITorrentListResponse> => {
+  try {
+    const response = await axios.get(
+      deleteTorrentUrl.replace("{hash}", torrent.hash)
+    );
+    return response.data;
+  } catch (e) {
+    throw new Error("Could not delete torrent");
   }
 };
 
@@ -102,6 +116,7 @@ export {
   addTorrent,
   changeTorrentStatus,
   clearComplete,
+  deleteTorrent,
   getTorrentList,
   torrentSearch,
   verifyLocation
