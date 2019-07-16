@@ -1,7 +1,8 @@
 <?php
 
 class ThePirateBay {
-    private $url = 'https://baypirateproxy.org';
+    // private $url = 'https://baypirateproxy.org';
+    private $url = 'https://proxtpb.art';
 
     /*
        * Search()

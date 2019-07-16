@@ -75,7 +75,6 @@ class Leekx {
         $body = file_get_contents($url);
         preg_match(
             "`" .
-            "<ul.*download-links.*" .
             "<a.*href=\"(?P<link>magnet:.*)\"" .
             "`siU",
             $body,
