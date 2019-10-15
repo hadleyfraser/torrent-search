@@ -19,10 +19,10 @@ function pr($arr, $exit = true) {
 */
 function unit_size($unit) {
     switch ($unit) {
-        case "KiB": return 1000;
-        case "MiB": return 1000000;
-        case "GiB": return 1000000000;
-        case "TiB": return 1000000000000;
+        case "KB": return 1000;
+        case "MB": return 1000000;
+        case "GB": return 1000000000;
+        case "TB": return 1000000000000;
         default: return 1;
     }
 }

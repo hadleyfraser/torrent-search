@@ -12,7 +12,7 @@ const ModalContent = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   max-height: 80%;
-  ${(props: IProps) => (!props.small ? "min-width: 250px;" : "")}
+  ${(props: IProps) => (!props.small ? "min-width: 250px;" : "min-width: 90px")}
   overflow: auto;
   background: #fff;
   border-radius: 5px;
