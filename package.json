@@ -16,7 +16,7 @@
     "request": "^2.88.0",
     "styled-components": "^4.1.1",
     "typeface-roboto": "^0.0.54",
-    "url-parse": "^1.4.7"
+    "url-parse": "^1.5.0"
   },
   "scripts": {
     "start": "NODE_ENV=dev react-scripts-ts start",
